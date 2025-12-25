@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build
+dist/
+build/
+*.egg-info/
+.eggs/
+*.egg
+MANIFEST
+
+# Testing
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+playwright-report/
+test-results/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend specific
+*.local
+.cache/
+
+# Backend specific
+*.db
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+
+# Secrets
+*.pem
+*.key
+credentials.json
+service-account.json
+
+# Temporary
+tmp/
+temp/
+*.tmp

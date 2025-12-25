@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    networks:
+      - studyhub-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://studyhub:studyhub_dev@postgres:5432/studyhub
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+    networks:
+      - studyhub-network
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=studyhub
+      - POSTGRES_PASSWORD=studyhub_dev
+      - POSTGRES_DB=studyhub
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - studyhub-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - studyhub-network
+
+networks:
+  studyhub-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

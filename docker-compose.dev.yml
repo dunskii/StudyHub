@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=studyhub
+      - POSTGRES_PASSWORD=studyhub_dev
+      - POSTGRES_DB=studyhub
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - studyhub-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - studyhub-network
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@studyhub.local
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      - postgres
+    networks:
+      - studyhub-network
+
+networks:
+  studyhub-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

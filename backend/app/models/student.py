@@ -1,12 +1,22 @@
 """Student model."""
+from __future__ import annotations
+
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.curriculum_framework import CurriculumFramework
+    from app.models.note import Note
+    from app.models.session import Session
+    from app.models.student_subject import StudentSubject
+    from app.models.user import User
 
 
 class Student(Base):
@@ -26,7 +36,9 @@ class Student(Base):
     grade_level: Mapped[int] = mapped_column(Integer, nullable=False)
     school_stage: Mapped[str] = mapped_column(String(20), nullable=False)
     school: Mapped[str | None] = mapped_column(String(255))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     last_active_at: Mapped[datetime | None] = mapped_column(DateTime)
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -36,7 +48,7 @@ class Student(Base):
     )
 
     # Preferences
-    preferences: Mapped[dict] = mapped_column(
+    preferences: Mapped[dict[str, Any]] = mapped_column(
         JSONB,
         default=lambda: {
             "theme": "auto",
@@ -47,7 +59,7 @@ class Student(Base):
     )
 
     # Gamification
-    gamification: Mapped[dict] = mapped_column(
+    gamification: Mapped[dict[str, Any]] = mapped_column(
         JSONB,
         default=lambda: {
             "totalXP": 0,
@@ -58,16 +70,16 @@ class Student(Base):
     )
 
     # Relationships
-    parent: Mapped["User"] = relationship("User", back_populates="students")  # noqa: F821
-    framework: Mapped["CurriculumFramework"] = relationship(  # noqa: F821
+    parent: Mapped[User] = relationship("User", back_populates="students")
+    framework: Mapped[CurriculumFramework | None] = relationship(
         "CurriculumFramework", back_populates="students"
     )
-    subjects: Mapped[list["StudentSubject"]] = relationship(  # noqa: F821
+    subjects: Mapped[list[StudentSubject]] = relationship(
         "StudentSubject", back_populates="student", cascade="all, delete-orphan"
     )
-    notes: Mapped[list["Note"]] = relationship(  # noqa: F821
+    notes: Mapped[list[Note]] = relationship(
         "Note", back_populates="student", cascade="all, delete-orphan"
     )
-    sessions: Mapped[list["Session"]] = relationship(  # noqa: F821
+    sessions: Mapped[list[Session]] = relationship(
         "Session", back_populates="student", cascade="all, delete-orphan"
     )

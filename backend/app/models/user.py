@@ -1,12 +1,18 @@
 """User model (parent accounts)."""
-import uuid
-from datetime import datetime
+from __future__ import annotations
 
-from sqlalchemy import DateTime, String
+import uuid
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any
+
+from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.student import Student
 
 
 class User(Base):
@@ -23,8 +29,16 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     display_name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[str | None] = mapped_column(String(20))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    last_login_at: Mapped[datetime | None] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    # Privacy & Consent
+    privacy_policy_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    terms_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    marketing_consent: Mapped[bool] = mapped_column(Boolean, default=False)
+    data_processing_consent: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Subscription
     subscription_tier: Mapped[str] = mapped_column(String(20), default="free")
@@ -33,7 +47,7 @@ class User(Base):
     stripe_customer_id: Mapped[str | None] = mapped_column(String(255))
 
     # Preferences
-    preferences: Mapped[dict] = mapped_column(
+    preferences: Mapped[dict[str, Any]] = mapped_column(
         JSONB,
         default=lambda: {
             "emailNotifications": True,
@@ -42,9 +56,9 @@ class User(Base):
             "timezone": "Australia/Sydney",
         },
     )
-    metadata: Mapped[dict] = mapped_column(JSONB, default=dict)
+    user_metadata: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
 
     # Relationships
-    students: Mapped[list["Student"]] = relationship(  # noqa: F821
+    students: Mapped[list[Student]] = relationship(
         "Student", back_populates="parent", cascade="all, delete-orphan"
     )

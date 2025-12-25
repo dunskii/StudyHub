@@ -1,12 +1,19 @@
 """Senior Course model (HSC, VCE, etc.)."""
+from __future__ import annotations
+
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.curriculum_framework import CurriculumFramework
+    from app.models.subject import Subject
 
 
 class SeniorCourse(Base):
@@ -31,15 +38,19 @@ class SeniorCourse(Base):
     is_atar: Mapped[bool] = mapped_column(Boolean, default=True)
     prerequisites: Mapped[list[str] | None] = mapped_column(ARRAY(String))
     exclusions: Mapped[list[str] | None] = mapped_column(ARRAY(String))
-    modules: Mapped[dict | None] = mapped_column(JSONB)
-    assessment_components: Mapped[dict | None] = mapped_column(JSONB)
+    modules: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    assessment_components: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     display_order: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
     # Relationships
-    framework: Mapped["CurriculumFramework"] = relationship("CurriculumFramework")  # noqa: F821
-    subject: Mapped["Subject"] = relationship("Subject")  # noqa: F821
+    framework: Mapped[CurriculumFramework] = relationship("CurriculumFramework")
+    subject: Mapped[Subject] = relationship("Subject")

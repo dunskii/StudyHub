@@ -3,6 +3,7 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
     curriculum,
+    frameworks,
     notes,
     sessions,
     socratic,
@@ -12,6 +13,10 @@ from app.api.v1.endpoints import (
 
 api_router = APIRouter()
 
+api_router.include_router(
+    frameworks.router,
+    tags=["frameworks"],
+)
 api_router.include_router(
     curriculum.router,
     prefix="/curriculum",

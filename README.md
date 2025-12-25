@@ -77,6 +77,7 @@ studyhub/
 - Python 3.11+
 - Docker & Docker Compose
 - PostgreSQL 15+ (or use Docker)
+- Redis (optional, for production rate limiting)
 
 ### Quick Start
 
@@ -93,19 +94,27 @@ studyhub/
 
 3. **Or run locally**
 
-   Frontend:
+   **Frontend:**
    ```bash
    cd frontend
    npm install
    npm run dev
    ```
 
-   Backend:
+   **Backend:**
    ```bash
    cd backend
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
    pip install -r requirements.txt
+
+   # Run database migrations
+   alembic upgrade head
+
+   # Seed curriculum data (NSW)
+   python scripts/seed_nsw_curriculum.py
+
+   # Start the server
    uvicorn app.main:app --reload
    ```
 
@@ -118,12 +127,34 @@ cp frontend/.env.example frontend/.env
 cp backend/.env.example backend/.env
 ```
 
-Required variables:
-- `DATABASE_URL` - PostgreSQL connection string
+**Required variables:**
+- `DATABASE_URL` - PostgreSQL connection string (format: `postgresql+asyncpg://user:pass@host:port/db`)
+- `SECRET_KEY` - Application secret (minimum 32 characters for production)
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
-- `ANTHROPIC_API_KEY` - Claude API key
+
+**Optional variables:**
+- `ANTHROPIC_API_KEY` - Claude API key (for AI tutoring)
 - `GCP_VISION_KEY` - Google Cloud Vision API key (for OCR)
+- `REDIS_URL` - Redis connection string (for production multi-server rate limiting)
+
+### Setting Up the Test Database
+
+Tests require a separate database to avoid affecting development data:
+
+```bash
+# Create a test database
+createdb studyhub_test
+
+# Set the test database URL
+export TEST_DATABASE_URL="postgresql+asyncpg://user:pass@localhost:5432/studyhub_test"
+
+# Run backend tests
+cd backend
+pytest
+```
+
+> **Note:** Tests will fail without `TEST_DATABASE_URL` set. This is intentional to prevent accidental testing against production or development databases.
 
 ## Development
 
@@ -199,6 +230,17 @@ Each subject has a configured tutor style:
 ## License
 
 Private - All rights reserved
+
+## Deployment
+
+For production deployment instructions, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+Key deployment topics:
+- Environment setup and secure key generation
+- Database migrations and curriculum seeding
+- Digital Ocean App Platform configuration
+- Redis setup for multi-server deployments
+- Health checks and monitoring
 
 ## Support
 

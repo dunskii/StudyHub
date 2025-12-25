@@ -1,12 +1,20 @@
 """Student Subject enrolment model."""
+from __future__ import annotations
+
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.senior_course import SeniorCourse
+    from app.models.student import Student
+    from app.models.subject import Subject
 
 
 class StudentSubject(Base):
@@ -27,10 +35,12 @@ class StudentSubject(Base):
     senior_course_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("senior_courses.id")
     )
-    enrolled_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    enrolled_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     # Progress tracking
-    progress: Mapped[dict] = mapped_column(
+    progress: Mapped[dict[str, Any]] = mapped_column(
         JSONB,
         default=lambda: {
             "outcomesCompleted": [],
@@ -42,8 +52,8 @@ class StudentSubject(Base):
     )
 
     # Relationships
-    student: Mapped["Student"] = relationship("Student", back_populates="subjects")  # noqa: F821
-    subject: Mapped["Subject"] = relationship(  # noqa: F821
+    student: Mapped[Student] = relationship("Student", back_populates="subjects")
+    subject: Mapped[Subject] = relationship(
         "Subject", back_populates="student_subjects"
     )
-    senior_course: Mapped["SeniorCourse"] = relationship("SeniorCourse")  # noqa: F821
+    senior_course: Mapped[SeniorCourse | None] = relationship("SeniorCourse")

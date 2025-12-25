@@ -1,12 +1,20 @@
 """AI Interaction model for logging all AI conversations."""
-import uuid
-from datetime import datetime
+from __future__ import annotations
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
+import uuid
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any
+
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.session import Session
+    from app.models.student import Student
+    from app.models.subject import Subject
 
 
 class AIInteraction(Base):
@@ -41,16 +49,18 @@ class AIInteraction(Base):
     estimated_cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
 
     # Context
-    curriculum_context: Mapped[dict | None] = mapped_column(JSONB)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    curriculum_context: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     # Safety flags
-    flagged: Mapped[bool] = mapped_column(default=False)
+    flagged: Mapped[bool] = mapped_column(Boolean, default=False)
     flag_reason: Mapped[str | None] = mapped_column(String(255))
 
     # Relationships
-    session: Mapped["Session"] = relationship(  # noqa: F821
+    session: Mapped[Session] = relationship(
         "Session", back_populates="ai_interactions"
     )
-    student: Mapped["Student"] = relationship("Student")  # noqa: F821
-    subject: Mapped["Subject"] = relationship("Subject")  # noqa: F821
+    student: Mapped[Student] = relationship("Student")
+    subject: Mapped[Subject | None] = relationship("Subject")

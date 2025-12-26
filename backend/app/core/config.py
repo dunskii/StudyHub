@@ -22,6 +22,7 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str
+    test_database_url: str | None = None
 
     # Redis (optional - for production rate limiting, caching)
     redis_url: str | None = None
@@ -46,6 +47,9 @@ class Settings(BaseSettings):
 
     # Rate Limiting
     rate_limit_per_minute: int = 60
+
+    # Pagination
+    max_page_number: int = 1000  # Prevent expensive offset queries
 
     # Logging
     log_level: str = "INFO"

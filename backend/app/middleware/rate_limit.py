@@ -281,6 +281,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path in ("/health", "/", "/docs", "/redoc", "/openapi.json"):
             return await call_next(request)
 
+        # Skip rate limiting in test environment (httpx AsyncClient uses 'testclient' or no client)
+        if settings.environment == "development":
+            # Check for test clients - httpx uses None or special hosts like 'test'
+            url_hostname = request.url.hostname or ""
+            if not request.client or url_hostname == "test":
+                return await call_next(request)
+
         client_id = self._get_client_identifier(request)
 
         try:

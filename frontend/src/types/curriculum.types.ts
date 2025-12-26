@@ -58,9 +58,15 @@ export interface SeniorCourse {
   courseType: string
   units: number
   isAtar: boolean
+  atarCategory?: 'A' | 'B'
+  isExtension?: boolean
+  isVET?: boolean
   prerequisites?: string[]
   exclusions?: string[]
   modules?: Record<string, unknown>
   assessmentComponents?: Record<string, unknown>
   isActive: boolean
 }
+
+/** Re-export Subject from subject.types for convenience */
+export type { Subject } from './subject.types'

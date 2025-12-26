@@ -133,7 +133,7 @@ class TestRateLimitMiddleware:
         """Test that 429 is returned when rate limited."""
         async with AsyncClient(
             transport=ASGITransport(app=app_with_rate_limit),
-            base_url="http://test",
+            base_url="http://ratelimit-test",  # Use non-'test' hostname to enable rate limiting
         ) as client:
             # Make 5 requests (the limit)
             for _ in range(5):
@@ -150,7 +150,7 @@ class TestRateLimitMiddleware:
         """Test that rate limit headers are included in responses."""
         async with AsyncClient(
             transport=ASGITransport(app=app_with_rate_limit),
-            base_url="http://test",
+            base_url="http://ratelimit-test",  # Use non-'test' hostname to enable rate limiting
         ) as client:
             response = await client.get("/api/test")
 
@@ -163,7 +163,7 @@ class TestRateLimitMiddleware:
         """Test that Retry-After header is included when rate limited."""
         async with AsyncClient(
             transport=ASGITransport(app=app_with_rate_limit),
-            base_url="http://test",
+            base_url="http://ratelimit-test",  # Use non-'test' hostname to enable rate limiting
         ) as client:
             # Exhaust the limit
             for _ in range(5):

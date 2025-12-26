@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,10 +25,12 @@ class CurriculumOutcome(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     framework_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("curriculum_frameworks.id", ondelete="CASCADE")
+        UUID(as_uuid=True), ForeignKey("curriculum_frameworks.id", ondelete="CASCADE"),
+        index=True,  # Critical for framework isolation query performance
     )
     subject_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("subjects.id", ondelete="CASCADE")
+        UUID(as_uuid=True), ForeignKey("subjects.id", ondelete="CASCADE"),
+        index=True,  # Common filter in queries
     )
     outcome_code: Mapped[str] = mapped_column(String(30), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
@@ -47,3 +49,10 @@ class CurriculumOutcome(Base):
     # Relationships
     framework: Mapped[CurriculumFramework] = relationship("CurriculumFramework")
     subject: Mapped[Subject] = relationship("Subject", back_populates="outcomes")
+
+    # Composite indexes for common query patterns
+    __table_args__ = (
+        Index("ix_curriculum_outcomes_framework_subject", "framework_id", "subject_id"),
+        Index("ix_curriculum_outcomes_framework_stage", "framework_id", "stage"),
+        Index("ix_curriculum_outcomes_framework_strand", "framework_id", "strand"),
+    )

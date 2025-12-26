@@ -8,7 +8,7 @@ Usage:
     python scripts/seed_nsw_curriculum.py
 
 Requirements:
-    - DATABASE_URL environment variable must be set
+    - DATABASE_URL environment variable must be set (or in .env file)
     - Database migrations must be run first (alembic upgrade head)
 """
 import asyncio
@@ -18,6 +18,14 @@ from uuid import uuid4
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Load .env file if present
+try:
+    from dotenv import load_dotenv
+    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+    load_dotenv(env_path)
+except ImportError:
+    pass  # dotenv not installed, rely on environment variables
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine

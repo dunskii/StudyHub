@@ -147,7 +147,7 @@ describe('useSubjectStore', () => {
 
   describe('getSubjectByCode', () => {
     it('returns subject matching the code', () => {
-      const { setSubjects, getSubjectByCode } = useSubjectStore.getState();
+      const { setSubjects } = useSubjectStore.getState();
 
       setSubjects([mockSubject1, mockSubject2]);
 

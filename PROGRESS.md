@@ -1,7 +1,7 @@
 # StudyHub Development Progress
 
 **Last Updated**: 2025-12-26
-**Overall Progress**: 12% (Foundation Complete)
+**Overall Progress**: 25% (Core Curriculum Complete)
 
 ---
 
@@ -11,14 +11,15 @@
 |-------|------|--------|----------|
 | 0 | Project Setup | ✅ **COMPLETE** | 100% |
 | 1 | Foundation & Infrastructure | ✅ **COMPLETE** | 100% |
-| 2 | Core Features - Notes & Curriculum | **NEXT** | 0% |
-| 3 | AI Tutoring | NOT STARTED | 0% |
-| 4 | Revision & Spaced Repetition | NOT STARTED | 0% |
-| 5 | Parent Dashboard | NOT STARTED | 0% |
-| 6 | Gamification & Engagement | NOT STARTED | 0% |
-| 7 | HSC/Senior Features | NOT STARTED | 0% |
-| 8 | PWA & Offline | NOT STARTED | 0% |
-| 9 | Testing & Launch | NOT STARTED | 0% |
+| 2 | Core Curriculum System | ✅ **COMPLETE** | 100% |
+| 3 | User System & Auth | **NEXT** | 0% |
+| 4 | AI Tutoring | NOT STARTED | 0% |
+| 5 | Notes & OCR | NOT STARTED | 0% |
+| 6 | Revision & Spaced Repetition | NOT STARTED | 0% |
+| 7 | Parent Dashboard | NOT STARTED | 0% |
+| 8 | Gamification & Engagement | NOT STARTED | 0% |
+| 9 | PWA & Offline | NOT STARTED | 0% |
+| 10 | Testing & Launch | NOT STARTED | 0% |
 
 ---
 
@@ -120,21 +121,42 @@
 
 ---
 
-## Phase 2: Core Features - Notes & Curriculum
+## Phase 2: Core Curriculum System ✅ COMPLETE (2025-12-26)
 
-### Note Management
-- [ ] Note upload (camera, file)
-- [ ] Google Cloud Vision OCR
-- [ ] Note organization by subject
-- [ ] Note viewing interface
-- [ ] Curriculum tagging
+### Backend API ✅
+- [x] Subject endpoints (GET list, by ID, by code, outcomes)
+- [x] Curriculum outcome endpoints with filtering (stage, strand, pathway, search)
+- [x] Senior course endpoints with framework isolation
+- [x] Strand and stage enumeration endpoints
+- [x] CurriculumService with framework isolation
+- [x] SubjectService with filtering
+- [x] SeniorCourseService with framework validation
 
-### Curriculum Display
-- [ ] Subject selection UI
-- [ ] Outcome browser by stage
-- [ ] Strand navigation
-- [ ] Progress indicators
-- [ ] Pathway selection (Stage 5)
+### Frontend Components ✅
+- [x] SubjectCard with Lucide icons (memoized)
+- [x] SubjectGrid with loading/error states
+- [x] OutcomeCard (memoized)
+- [x] OutcomeList with loading/error/retry
+- [x] StageSelector (radio group)
+- [x] HSCCourseCard with accessibility
+- [x] HSCCourseSelector (multi-select)
+
+### Data & Configuration ✅
+- [x] NSW framework with 8 subjects seeded
+- [x] 55 sample curriculum outcomes seeded
+- [x] HSC courses for Mathematics seeded
+- [x] Subject-specific tutor styles configured
+- [x] Stage/pathway system (ES1-S6, 5.1/5.2/5.3)
+
+### Quality & Security ✅
+- [x] Database indexes on framework_id, subject_id
+- [x] Composite indexes for query patterns
+- [x] SQL wildcard escaping in search
+- [x] Max page limit (1000) on pagination
+- [x] React.memo on list items
+- [x] Error state handling with retry
+- [x] 118 backend tests, 210 frontend tests
+- [x] All QA issues resolved (3 review cycles)
 
 ---
 
@@ -220,6 +242,30 @@
 ---
 
 ## Changelog
+
+### 2025-12-26 - Phase 2 Complete
+- **Phase 2 Core Curriculum System: 100% COMPLETE**
+- Backend accomplishments:
+  - 13 API endpoints for subjects, curriculum, senior courses
+  - CurriculumService, SubjectService, SeniorCourseService
+  - Framework isolation on all curriculum queries
+  - Database indexes for query performance
+  - SQL wildcard escaping for search security
+  - Max page limit (1000) for DoS prevention
+  - 118 tests passing
+- Frontend accomplishments:
+  - 7 new components (SubjectCard, SubjectGrid, OutcomeCard, OutcomeList, StageSelector, HSCCourseCard, HSCCourseSelector)
+  - React Query hooks for data fetching
+  - Lucide React icons replacing emoji fallbacks
+  - React.memo optimization on list items
+  - Error state handling with retry functionality
+  - 210 tests passing (78 new tests)
+- Quality assurance:
+  - 3 QA review cycles completed
+  - All critical, medium, and optimization issues resolved
+  - Zero TypeScript errors
+- Work report created: `md/report/phase-2-complete.md`
+- Ready for Phase 3: User System & Authentication
 
 ### 2025-12-26 - Phase 1 Complete
 - **Phase 1 Foundation & Infrastructure: 100% COMPLETE**

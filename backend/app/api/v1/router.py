@@ -8,11 +8,20 @@ from app.api.v1.endpoints import (
     senior_courses,
     sessions,
     socratic,
+    student_subjects,
     students,
     subjects,
+    users,
 )
 
 api_router = APIRouter()
+
+# User endpoints (parent accounts)
+api_router.include_router(
+    users.router,
+    prefix="/users",
+    tags=["users"],
+)
 
 api_router.include_router(
     frameworks.router,
@@ -52,4 +61,11 @@ api_router.include_router(
     socratic.router,
     prefix="/socratic",
     tags=["ai-tutor"],
+)
+
+# Student subject enrolment endpoints (nested under students)
+api_router.include_router(
+    student_subjects.router,
+    prefix="/students",
+    tags=["enrolments"],
 )

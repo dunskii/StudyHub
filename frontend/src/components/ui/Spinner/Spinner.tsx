@@ -21,7 +21,7 @@ export interface SpinnerProps
     VariantProps<typeof spinnerVariants> {}
 
 const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
-  ({ className, size, ...props }, ref) => {
+  ({ className, size, 'aria-label': ariaLabel = 'Loading', ...props }, ref) => {
     return (
       <svg
         ref={ref}
@@ -29,6 +29,8 @@ const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
         fill="none"
         viewBox="0 0 24 24"
         className={cn(spinnerVariants({ size, className }))}
+        role="status"
+        aria-label={ariaLabel}
         {...props}
       >
         <circle
@@ -61,8 +63,13 @@ const Loading: React.FC<LoadingProps> = ({
   ...props
 }) => {
   return (
-    <div className="flex min-h-[200px] flex-col items-center justify-center gap-3">
-      <Spinner size={size} {...props} />
+    <div
+      className="flex min-h-[200px] flex-col items-center justify-center gap-3"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <Spinner size={size} aria-hidden="true" {...props} />
       {text && <p className="text-sm text-muted-foreground">{text}</p>}
     </div>
   );

@@ -22,7 +22,6 @@ class StudentCreate(StudentBase):
 
     parent_id: UUID
     supabase_auth_id: UUID | None = None
-    avatar_url: str | None = None
     preferences: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -32,28 +31,35 @@ class StudentUpdate(BaseSchema):
     display_name: str | None = Field(None, min_length=1, max_length=255)
     grade_level: int | None = Field(None, ge=0, le=12)
     school_stage: str | None = Field(None, max_length=20)
-    avatar_url: str | None = None
     preferences: dict[str, Any] | None = None
     onboarding_completed: bool | None = None
+
+
+class StreakData(BaseSchema):
+    """Streak tracking data."""
+
+    current: int = 0
+    longest: int = 0
+    lastActiveDate: str | None = None
 
 
 class GamificationData(BaseSchema):
     """Gamification stats for a student."""
 
-    xp: int = 0
+    totalXP: int = Field(default=0, alias="totalXP")
     level: int = 1
-    streak: int = 0
+    achievements: list[str] = Field(default_factory=list)
+    streaks: StreakData = Field(default_factory=StreakData)
 
 
 class StudentResponse(StudentBase, IDMixin, TimestampMixin):
     """Schema for student response."""
 
     parent_id: UUID
-    supabase_auth_id: UUID | None
-    avatar_url: str | None
+    supabase_auth_id: UUID | None = None
     preferences: dict[str, Any]
-    gamification: GamificationData
-    last_active_at: datetime | None
+    gamification: dict[str, Any]
+    last_active_at: datetime | None = None
     onboarding_completed: bool
 
 
@@ -64,7 +70,6 @@ class StudentSummary(BaseSchema):
     display_name: str
     grade_level: int
     school_stage: str
-    avatar_url: str | None
 
 
 class StudentListResponse(BaseSchema):

@@ -6,6 +6,16 @@
 export { api, ApiClient, ApiError } from './client'
 export type { ApiErrorCode } from './client'
 
+// User API
+export { usersApi } from './users'
+
+// Student API
+export { studentsApi } from './students'
+
+// Enrolment API
+export { enrolmentsApi } from './enrolments'
+export type { Enrolment, EnrolmentProgress, SubjectSummary, SeniorCourseSummary } from './enrolments'
+
 // Subject API
 export {
   getSubjects,

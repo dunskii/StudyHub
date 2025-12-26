@@ -41,6 +41,18 @@ from app.schemas.subject import (
     SubjectSummary,
     SubjectUpdate,
 )
+from app.schemas.student_subject import (
+    BulkEnrolmentRequest,
+    BulkEnrolmentResponse,
+    EnrolmentRequest,
+    StudentSubjectCreate,
+    StudentSubjectListResponse,
+    StudentSubjectProgress,
+    StudentSubjectProgressUpdate,
+    StudentSubjectResponse,
+    StudentSubjectUpdate,
+    StudentSubjectWithDetails,
+)
 from app.schemas.user import UserCreate, UserResponse, UserSummary, UserUpdate
 
 __all__ = [
@@ -90,4 +102,15 @@ __all__ = [
     "StudentSummary",
     "StudentListResponse",
     "GamificationData",
+    # Student Subject / Enrolment
+    "StudentSubjectCreate",
+    "StudentSubjectUpdate",
+    "StudentSubjectResponse",
+    "StudentSubjectProgress",
+    "StudentSubjectProgressUpdate",
+    "StudentSubjectWithDetails",
+    "StudentSubjectListResponse",
+    "EnrolmentRequest",
+    "BulkEnrolmentRequest",
+    "BulkEnrolmentResponse",
 ]

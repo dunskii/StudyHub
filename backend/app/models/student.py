@@ -39,7 +39,12 @@ class Student(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
-    last_active_at: Mapped[datetime | None] = mapped_column(DateTime)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+    last_active_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Curriculum framework

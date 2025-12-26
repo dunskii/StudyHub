@@ -1,7 +1,7 @@
 # StudyHub Development Progress
 
 **Last Updated**: 2025-12-26
-**Overall Progress**: 25% (Core Curriculum Complete)
+**Overall Progress**: 40% (User System Complete)
 
 ---
 
@@ -12,8 +12,8 @@
 | 0 | Project Setup | ✅ **COMPLETE** | 100% |
 | 1 | Foundation & Infrastructure | ✅ **COMPLETE** | 100% |
 | 2 | Core Curriculum System | ✅ **COMPLETE** | 100% |
-| 3 | User System & Auth | **NEXT** | 0% |
-| 4 | AI Tutoring | NOT STARTED | 0% |
+| 3 | User System & Auth | ✅ **COMPLETE** | 100% |
+| 4 | AI Tutoring | **NEXT** | 0% |
 | 5 | Notes & OCR | NOT STARTED | 0% |
 | 6 | Revision & Spaced Repetition | NOT STARTED | 0% |
 | 7 | Parent Dashboard | NOT STARTED | 0% |
@@ -160,7 +160,61 @@
 
 ---
 
-## Phase 3: AI Tutoring
+## Phase 3: User System & Auth ✅ COMPLETE (2025-12-26)
+
+### Backend ✅
+- [x] UserService with CRUD operations
+- [x] StudentService with ownership verification
+- [x] StudentSubjectService with pathway support
+- [x] DataExportService for privacy compliance
+- [x] Auth rate limiting (5 attempts/min, 5-min lockout)
+- [x] POST /api/v1/users (with rate limiting)
+- [x] GET /api/v1/users/me
+- [x] PUT /api/v1/users/me
+- [x] GET /api/v1/users/me/students
+- [x] GET /api/v1/users/me/export (data portability)
+- [x] POST /api/v1/users/me/accept-privacy-policy
+- [x] POST /api/v1/users/me/accept-terms
+- [x] GET/PUT/DELETE /api/v1/students/{id}
+- [x] GET/POST/DELETE /api/v1/students/{id}/enrolments
+- [x] Fixed streak calculation bug
+
+### Frontend ✅
+- [x] AuthProvider context
+- [x] AuthGuard route protection
+- [x] LoginForm with validation
+- [x] SignupForm with validation
+- [x] StudentProfile component
+- [x] StudentSwitcher dropdown
+- [x] OnboardingWizard (4 steps)
+- [x] EnrolmentManager with progress
+- [x] EnrolmentCard with progress bar
+- [x] SubjectEnrolModal
+- [x] PathwaySelector
+
+### Accessibility ✅
+- [x] ARIA labels on Spinner
+- [x] aria-live regions for loading
+- [x] aria-hidden on decorative icons
+- [x] role="progressbar" with proper attributes
+- [x] Accessible StudentAvatar
+
+### Security ✅
+- [x] Auth rate limiting (brute force protection)
+- [x] Data export for GDPR/Privacy Act
+- [x] Ownership verification on all operations
+- [x] ErrorBoundary in main app
+
+### Quality Gates ✅
+- [x] 236 backend tests passing
+- [x] 266 frontend tests passing
+- [x] Privacy audit completed
+- [x] QA review completed
+- [x] All issues resolved
+
+---
+
+## Phase 4: AI Tutoring
 
 ### Claude Integration
 - [ ] Claude service with model routing
@@ -242,6 +296,34 @@
 ---
 
 ## Changelog
+
+### 2025-12-26 - Phase 3 Complete
+- **Phase 3 User System & Auth: 100% COMPLETE**
+- Backend accomplishments:
+  - UserService, StudentService, StudentSubjectService
+  - DataExportService for GDPR/Privacy Act compliance
+  - Auth rate limiting (5 attempts/min, 5-min lockout)
+  - 14 API endpoints for user and student management
+  - Fixed streak calculation bug
+  - 236 tests passing
+- Frontend accomplishments:
+  - Auth components (AuthProvider, AuthGuard, LoginForm, SignupForm)
+  - Student components (StudentProfile, StudentSwitcher)
+  - Onboarding wizard (4 steps)
+  - Enrolment management (EnrolmentManager, EnrolmentCard, SubjectEnrolModal)
+  - Accessibility improvements (ARIA labels, live regions, progressbar roles)
+  - ErrorBoundary wrapping main app
+  - 266 tests passing
+- Security:
+  - Auth rate limiting for brute force protection
+  - Data export endpoint for privacy compliance
+  - Ownership verification on all operations
+- Quality assurance:
+  - Privacy audit completed
+  - QA review completed
+  - All issues resolved
+- Work report created: `md/report/phase-3-complete.md`
+- Ready for Phase 4: AI Tutoring
 
 ### 2025-12-26 - Phase 2 Complete
 - **Phase 2 Core Curriculum System: 100% COMPLETE**

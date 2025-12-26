@@ -40,6 +40,8 @@ class UserResponse(UserBase, IDMixin, TimestampMixin):
     subscription_expires_at: datetime | None
     preferences: dict[str, Any]
     last_login_at: datetime | None
+    privacy_policy_accepted_at: datetime | None = None
+    terms_accepted_at: datetime | None = None
 
 
 class UserSummary(BaseSchema):

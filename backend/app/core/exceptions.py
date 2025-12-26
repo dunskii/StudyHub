@@ -77,14 +77,17 @@ class NotFoundError(AppException):
 class AlreadyExistsError(AppException):
     """Resource already exists error."""
 
-    def __init__(self, resource: str):
+    def __init__(self, resource: str, field: str | None = None):
         # Sanitize - don't include user-provided data
-        message = f"{resource} already exists"
+        if field:
+            message = f"{resource} with this {field} already exists"
+        else:
+            message = f"{resource} already exists"
         super().__init__(
             status_code=status.HTTP_409_CONFLICT,
             error_code=ErrorCode.ALREADY_EXISTS,
             message=message,
-            details={"resource": resource},
+            details={"resource": resource, "field": field} if field else {"resource": resource},
         )
 
 
@@ -138,6 +141,18 @@ async def http_exception_handler(request: Request, exc: Exception) -> JSONRespon
     http_exc = exc if isinstance(exc, HTTPException) else HTTPException(
         status_code=500, detail="Internal error"
     )
+
+    # If the detail is a dict with error_code and message, preserve it
+    # This supports custom validation errors from services
+    if isinstance(http_exc.detail, dict) and "error_code" in http_exc.detail:
+        return JSONResponse(
+            status_code=http_exc.status_code,
+            content=ErrorResponse(
+                error_code=http_exc.detail["error_code"],
+                message=http_exc.detail.get("message", "Validation error"),
+                details=http_exc.detail.get("details"),
+            ).model_dump(),
+        )
 
     # Map status codes to generic error messages
     status_messages = {

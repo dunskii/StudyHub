@@ -451,3 +451,82 @@ async def sample_senior_courses(db_session: AsyncSession, sample_subject: Any, s
     for course in courses:
         await db_session.refresh(course)
     return courses
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_student(
+    db_session: AsyncSession,
+    sample_user: Any,
+    sample_framework: Any,
+) -> Any:
+    """Create a sample student in the database."""
+    from app.models.student import Student
+    import uuid
+
+    student = Student(
+        id=uuid.uuid4(),
+        parent_id=sample_user.id,
+        display_name="Test Student",
+        grade_level=5,
+        school_stage="S3",
+        framework_id=sample_framework.id,
+        preferences={
+            "theme": "auto",
+            "studyReminders": True,
+            "dailyGoalMinutes": 30,
+            "language": "en-AU",
+        },
+        gamification={
+            "totalXP": 0,
+            "level": 1,
+            "achievements": [],
+            "streaks": {"current": 0, "longest": 0, "lastActiveDate": None},
+        },
+    )
+    db_session.add(student)
+    await db_session.commit()
+    await db_session.refresh(student)
+    return student
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_stage5_student(
+    db_session: AsyncSession,
+    sample_user: Any,
+    sample_framework: Any,
+) -> Any:
+    """Create a Stage 5 student in the database."""
+    from app.models.student import Student
+    import uuid
+
+    student = Student(
+        id=uuid.uuid4(),
+        parent_id=sample_user.id,
+        display_name="Stage 5 Student",
+        grade_level=9,
+        school_stage="S5",
+        framework_id=sample_framework.id,
+    )
+    db_session.add(student)
+    await db_session.commit()
+    await db_session.refresh(student)
+    return student
+
+
+@pytest_asyncio.fixture(scope="function")
+async def another_user(db_session: AsyncSession) -> Any:
+    """Create another user for access control tests."""
+    from app.models.user import User
+    import uuid
+
+    user = User(
+        id=uuid.uuid4(),
+        supabase_auth_id=uuid.uuid4(),
+        email="other@example.com",
+        display_name="Other User",
+        subscription_tier="free",
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user

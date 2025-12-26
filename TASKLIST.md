@@ -3,8 +3,8 @@
 **Single source of truth for all development tasks.**
 
 **Last Updated**: 2025-12-26
-**Current Phase**: 3 - User System & Auth
-**Overall Progress**: ~25%
+**Current Phase**: 4 - AI Tutoring
+**Overall Progress**: ~40%
 
 ---
 
@@ -15,8 +15,8 @@
 | 0 | Project Setup | ✅ COMPLETE | 100% |
 | 1 | Foundation & Infrastructure | ✅ COMPLETE | 100% |
 | 2 | Core Curriculum System | ✅ COMPLETE | 100% |
-| 3 | User System & Auth | **NEXT** | 0% |
-| 4 | AI Tutoring Foundation | NOT STARTED | 0% |
+| 3 | User System & Auth | ✅ COMPLETE | 100% |
+| 4 | AI Tutoring Foundation | **NEXT** | 0% |
 | 5 | Notes and OCR | NOT STARTED | 0% |
 | 6 | Revision System | NOT STARTED | 0% |
 | 7 | Parent Dashboard | NOT STARTED | 0% |
@@ -25,33 +25,37 @@
 
 ---
 
-## Current Sprint - Phase 3 Kickoff
+## Current Sprint - Phase 4 Kickoff
 
-### Priority 1: Database Setup (BLOCKING)
-- [ ] Configure PostgreSQL locally or via Supabase
-- [ ] Set DATABASE_URL and TEST_DATABASE_URL in .env
-- [ ] Run all 12 Alembic migrations: `alembic upgrade head`
-- [ ] Verify database connectivity
-- [ ] Run backend tests to ensure all pass
+### Priority 1: Claude Service Setup
+- [ ] Install Anthropic SDK
+- [ ] Create ClaudeService with model routing (Haiku vs Sonnet)
+- [ ] Implement cost tracking per interaction
+- [ ] Add AI interaction logging to database
 
-### Priority 2: Supabase Auth Setup (BLOCKING)
-- [ ] Create Supabase project
-- [ ] Get Supabase API keys (URL, ANON_KEY, SERVICE_KEY)
-- [ ] Set environment variables in both frontend and backend
-- [ ] Test Supabase connection
+### Priority 2: Subject-Specific Prompts
+- [ ] Create base tutor prompt template
+- [ ] Mathematics: socratic_stepwise prompt
+- [ ] English: mentor_guide prompt
+- [ ] Science: inquiry_based prompt
+- [ ] HSIE: socratic_discussion prompt
+- [ ] PDHPE: activity_coach prompt
+- [ ] TAS: design_mentor prompt
+- [ ] Creative Arts: creative_facilitator prompt
+- [ ] Languages: immersive_coach prompt
 
-### Priority 3: User Authentication Flow
-- [ ] Implement Supabase Auth integration
-- [ ] Build login/signup pages
-- [ ] Implement AuthGuard component
-- [ ] Add user profile endpoints
-- [ ] Build student management endpoints
+### Priority 3: Safety & Moderation
+- [ ] Implement age-appropriate language filter
+- [ ] Add content moderation for concerning messages
+- [ ] Create parent visibility for AI conversations
+- [ ] Implement Socratic method (never give direct answers)
 
-### Up Next (Phase 3 Week 2)
-- [ ] Build onboarding flow for new students
-- [ ] Implement student-subject selection
-- [ ] Build StudentProfile component
-- [ ] Implement access control (parent/child verification)
+### Up Next (Phase 4 Week 2)
+- [ ] Build TutorChat component
+- [ ] Build ChatMessage component
+- [ ] Build ChatInput component
+- [ ] Implement conversation history view
+- [ ] Add typing indicator
 
 ---
 
@@ -214,41 +218,45 @@
 
 ---
 
-## Phase 3: User System
+## Phase 3: User System ✅ COMPLETE (2025-12-26)
 
-### 3.1 Database
-- [ ] Create student_subjects migration
-- [ ] Add indexes for performance
+### 3.1 Backend ✅
+- [x] UserService with CRUD operations
+- [x] StudentService with ownership verification
+- [x] StudentSubjectService with pathway support
+- [x] DataExportService for privacy compliance
+- [x] Auth rate limiting (5 attempts/min, 5-min lockout)
+- [x] POST /api/v1/users (with rate limiting)
+- [x] GET /api/v1/users/me
+- [x] PUT /api/v1/users/me
+- [x] GET /api/v1/users/me/students
+- [x] GET /api/v1/users/me/export
+- [x] GET/PUT/DELETE /api/v1/students/{id}
+- [x] GET/POST/DELETE /api/v1/students/{id}/enrolments
 
-### 3.2 Backend
-- [ ] User service
-- [ ] Student service
-- [ ] StudentSubject service
-- [ ] Access control (parent/child verification)
-- [ ] POST /api/v1/users (after Supabase signup)
-- [ ] GET /api/v1/users/me
-- [ ] PUT /api/v1/users/me
-- [ ] GET /api/v1/students
-- [ ] POST /api/v1/students
-- [ ] GET /api/v1/students/{id}
-- [ ] PUT /api/v1/students/{id}
-- [ ] DELETE /api/v1/students/{id}
-- [ ] GET /api/v1/students/{id}/subjects
-- [ ] POST /api/v1/students/{id}/subjects
-- [ ] DELETE /api/v1/students/{id}/subjects/{sid}
+### 3.2 Frontend ✅
+- [x] AuthProvider context
+- [x] AuthGuard route protection
+- [x] LoginForm with validation
+- [x] SignupForm with validation
+- [x] StudentProfile component
+- [x] StudentSwitcher dropdown
+- [x] OnboardingWizard (4 steps)
+- [x] EnrolmentManager with progress
+- [x] EnrolmentCard with progress bar
+- [x] SubjectEnrolModal
 
-### 3.3 Frontend
-- [ ] Onboarding flow
-- [ ] StudentOnboarding component
-- [ ] SubjectSelection component
-- [ ] PathwaySelection component
-- [ ] StudentProfile component
-- [ ] StudentSwitcher (for parents with multiple children)
+### 3.3 Security ✅
+- [x] Auth rate limiting for brute force protection
+- [x] Data export for GDPR/Privacy Act
+- [x] Ownership verification on all operations
+- [x] ErrorBoundary in main app
 
-### 3.4 Quality Gates
-- [ ] Access control tests passing
-- [ ] Run student-data-privacy-audit skill
-- [ ] Parent cannot access other parents' children
+### 3.4 Quality Gates ✅
+- [x] 236 backend tests passing
+- [x] 266 frontend tests passing
+- [x] Privacy audit completed
+- [x] QA review completed
 
 ---
 
@@ -454,6 +462,23 @@
 ---
 
 ## Completed Tasks Log
+
+### 2025-12-26 - Phase 3 Complete
+- [x] UserService, StudentService, StudentSubjectService
+- [x] DataExportService for GDPR/Privacy Act compliance
+- [x] Auth rate limiting (5 attempts/min, 5-min lockout)
+- [x] 14 API endpoints for user and student management
+- [x] Fixed streak calculation bug
+- [x] Auth components (AuthProvider, AuthGuard, LoginForm, SignupForm)
+- [x] Student components (StudentProfile, StudentSwitcher)
+- [x] Onboarding wizard (4 steps)
+- [x] Enrolment management (EnrolmentManager, EnrolmentCard, SubjectEnrolModal)
+- [x] Accessibility improvements (ARIA labels, live regions, progressbar roles)
+- [x] ErrorBoundary wrapping main app
+- [x] 236 backend tests, 266 frontend tests
+- [x] Privacy audit completed
+- [x] QA review completed
+- [x] Work report: `md/report/phase-3-complete.md`
 
 ### 2025-12-26 - Phase 2 Complete
 - [x] 13 API endpoints for subjects, curriculum, senior courses

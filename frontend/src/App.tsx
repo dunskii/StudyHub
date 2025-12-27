@@ -1,4 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
+import { TutorPage } from '@/pages/TutorPage'
+import { NotesPage } from '@/pages/NotesPage'
+import { AuthGuard } from '@/features/auth/AuthGuard'
 
 function App() {
   return (
@@ -8,10 +11,19 @@ function App() {
         <Route path="/login" element={<div>Login</div>} />
         <Route path="/dashboard" element={<div>Dashboard</div>} />
         <Route path="/subjects" element={<div>Subjects</div>} />
-        <Route path="/tutor" element={<div>AI Tutor</div>} />
+        <Route path="/tutor" element={
+          <AuthGuard requireStudent>
+            <TutorPage />
+          </AuthGuard>
+        } />
         <Route path="/revision" element={<div>Revision</div>} />
-        <Route path="/notes" element={<div>Notes</div>} />
+        <Route path="/notes" element={
+          <AuthGuard requireStudent>
+            <NotesPage />
+          </AuthGuard>
+        } />
         <Route path="/parent" element={<div>Parent Dashboard</div>} />
+        <Route path="/select-student" element={<div>Select Student</div>} />
       </Routes>
     </div>
   )

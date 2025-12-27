@@ -35,9 +35,46 @@ class Settings(BaseSettings):
     # Anthropic Claude API
     anthropic_api_key: str = ""
 
+    # AI Tutoring Configuration
+    ai_model_complex: str = "claude-sonnet-4-20250514"  # For tutoring, essay feedback
+    ai_model_simple: str = "claude-3-5-haiku-20241022"  # For flashcards, summaries
+    ai_max_tokens: int = 2048  # Max response tokens
+    ai_conversation_context_limit: int = 10  # Max previous messages to include
+    ai_daily_token_limit: int = 50000  # Daily token limit per student
+    ai_session_timeout_minutes: int = 30  # Auto-end session after inactivity
+
     # Google Cloud Vision (OCR)
     gcp_project_id: str = ""
-    gcp_vision_key: str = ""
+    gcp_vision_key: str = ""  # API key (optional, prefer service account)
+    google_application_credentials: str = ""  # Path to service account JSON
+
+    # Digital Ocean Spaces (S3-compatible storage)
+    do_spaces_key: str = ""
+    do_spaces_secret: str = ""
+    do_spaces_bucket: str = "studyhub-notes"
+    do_spaces_region: str = "syd1"
+    do_spaces_endpoint: str = ""  # e.g., https://syd1.digitaloceanspaces.com
+
+    # Note/OCR Settings
+    ocr_enabled: bool = True
+    note_max_file_size_mb: int = 10
+    note_max_per_student: int = 1000
+    note_thumbnail_size: int = 300  # px for thumbnail dimension
+    note_max_dimension: int = 2048  # Max px for OCR processing
+    note_supported_formats: str = "image/jpeg,image/png,image/heic,application/pdf"
+    note_presigned_url_expiry: int = 3600  # Seconds (1 hour)
+
+    @property
+    def note_supported_formats_list(self) -> list[str]:
+        """Parse supported formats from comma-separated string."""
+        return [fmt.strip() for fmt in self.note_supported_formats.split(",") if fmt.strip()]
+
+    @property
+    def do_spaces_url(self) -> str:
+        """Get the full DO Spaces URL."""
+        if self.do_spaces_endpoint:
+            return self.do_spaces_endpoint
+        return f"https://{self.do_spaces_region}.digitaloceanspaces.com"
 
     # Application
     secret_key: str = "dev-secret-key-change-in-production"

@@ -57,3 +57,33 @@ export {
   useCoursesBySubject,
   useSeniorCourseList,
 } from './useSeniorCourses'
+
+// Tutor hooks
+export {
+  tutorKeys,
+  useCreateSession,
+  useEndSession,
+  useSession,
+  useActiveSession,
+  useStudentSessions,
+  useSendMessage,
+  useChatHistory,
+  useGenerateFlashcards,
+  useSummariseText,
+  useTutorChat,
+} from './useTutor'
+
+// Note hooks
+export {
+  noteKeys,
+  useNotes,
+  useNote,
+  useUploadNote,
+  useUpdateNote,
+  useDeleteNote,
+  useTriggerOcr,
+  useOcrStatus,
+  useAlignCurriculum,
+  useUpdateOutcomes,
+  useNoteManager,
+} from './useNotes'

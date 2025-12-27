@@ -47,3 +47,46 @@ export {
   getCoursesBySubject,
 } from './senior-courses'
 export type { SeniorCourseListResponse, SeniorCourseQueryParams } from './senior-courses'
+
+// Tutor API
+export {
+  tutorApi,
+  sendChatMessage,
+  getChatHistory,
+  generateFlashcards,
+  summariseText,
+  createSession,
+  getSession,
+  endSession,
+  getStudentSessions,
+  getActiveSession,
+} from './tutor'
+export type {
+  ChatRequest,
+  ChatResponse,
+  ChatHistoryMessage,
+  ChatHistoryResponse,
+  FlashcardItem,
+  FlashcardRequest,
+  FlashcardResponse,
+  SummariseRequest,
+  SummariseResponse,
+  SessionCreateRequest,
+  SessionResponse,
+  SessionListResponse,
+} from './tutor'
+
+// Notes API
+export { notesApi } from './notes'
+export type {
+  UploadUrlRequest,
+  UploadUrlResponse,
+  NoteCreateRequest,
+  NoteUpdateRequest,
+  NoteResponse,
+  NoteListResponse,
+  OCRStatusResponse,
+  CurriculumSuggestion,
+  CurriculumAlignmentResponse,
+  NoteListParams,
+} from './notes'

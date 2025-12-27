@@ -54,6 +54,45 @@ from app.schemas.student_subject import (
     StudentSubjectWithDetails,
 )
 from app.schemas.user import UserCreate, UserResponse, UserSummary, UserUpdate
+from app.schemas.session import (
+    SessionCreate,
+    SessionData,
+    SessionEndRequest,
+    SessionListResponse,
+    SessionResponse,
+    SessionStatsUpdate,
+    SessionUpdate,
+)
+from app.schemas.ai_interaction import (
+    AIInteractionListResponse,
+    AIInteractionResponse,
+    ChatHistoryMessage,
+    ChatHistoryResponse,
+    ChatRequest,
+    ChatResponse,
+    CurriculumContext,
+    FlashcardItem,
+    FlashcardRequest,
+    FlashcardResponse,
+    InteractionFlagRequest,
+    SummariseRequest,
+    SummariseResponse,
+    TokenUsageResponse,
+)
+from app.schemas.note import (
+    CurriculumAlignmentResponse,
+    CurriculumSuggestion,
+    NoteCreate,
+    NoteListResponse,
+    NoteResponse,
+    NoteSearchResponse,
+    NoteSearchResult,
+    NoteUpdate,
+    OCRStatusResponse,
+    OutcomeUpdateRequest,
+    UploadUrlRequest,
+    UploadUrlResponse,
+)
 
 __all__ = [
     # Base
@@ -113,4 +152,40 @@ __all__ = [
     "EnrolmentRequest",
     "BulkEnrolmentRequest",
     "BulkEnrolmentResponse",
+    # Session
+    "SessionCreate",
+    "SessionUpdate",
+    "SessionResponse",
+    "SessionListResponse",
+    "SessionData",
+    "SessionEndRequest",
+    "SessionStatsUpdate",
+    # AI Interaction
+    "AIInteractionResponse",
+    "AIInteractionListResponse",
+    "ChatRequest",
+    "ChatResponse",
+    "ChatHistoryMessage",
+    "ChatHistoryResponse",
+    "FlashcardItem",
+    "FlashcardRequest",
+    "FlashcardResponse",
+    "SummariseRequest",
+    "SummariseResponse",
+    "CurriculumContext",
+    "TokenUsageResponse",
+    "InteractionFlagRequest",
+    # Note
+    "NoteCreate",
+    "NoteUpdate",
+    "NoteResponse",
+    "NoteListResponse",
+    "NoteSearchResult",
+    "NoteSearchResponse",
+    "UploadUrlRequest",
+    "UploadUrlResponse",
+    "OCRStatusResponse",
+    "CurriculumSuggestion",
+    "CurriculumAlignmentResponse",
+    "OutcomeUpdateRequest",
 ]

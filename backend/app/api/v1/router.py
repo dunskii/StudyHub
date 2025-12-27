@@ -5,6 +5,7 @@ from app.api.v1.endpoints import (
     curriculum,
     frameworks,
     notes,
+    revision,
     senior_courses,
     sessions,
     socratic,
@@ -68,4 +69,9 @@ api_router.include_router(
     student_subjects.router,
     prefix="/students",
     tags=["enrolments"],
+)
+api_router.include_router(
+    revision.router,
+    prefix="/revision",
+    tags=["revision"],
 )

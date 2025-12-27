@@ -13,7 +13,9 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.curriculum_framework import CurriculumFramework
+    from app.models.flashcard import Flashcard
     from app.models.note import Note
+    from app.models.revision_history import RevisionHistory
     from app.models.session import Session
     from app.models.student_subject import StudentSubject
     from app.models.user import User
@@ -87,4 +89,10 @@ class Student(Base):
     )
     sessions: Mapped[list[Session]] = relationship(
         "Session", back_populates="student", cascade="all, delete-orphan"
+    )
+    flashcards: Mapped[list[Flashcard]] = relationship(
+        "Flashcard", back_populates="student", cascade="all, delete-orphan"
+    )
+    revision_history: Mapped[list[RevisionHistory]] = relationship(
+        "RevisionHistory", back_populates="student", cascade="all, delete-orphan"
     )

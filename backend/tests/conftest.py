@@ -530,3 +530,148 @@ async def another_user(db_session: AsyncSession) -> Any:
     await db_session.commit()
     await db_session.refresh(user)
     return user
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_flashcard(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subject: Any,
+) -> Any:
+    """Create a sample flashcard in the database."""
+    from app.models.flashcard import Flashcard
+    import uuid
+
+    flashcard = Flashcard(
+        id=uuid.uuid4(),
+        student_id=sample_student.id,
+        subject_id=sample_subject.id,
+        front="What is 2 + 2?",
+        back="4",
+        generated_by="user",
+        sr_interval=1,
+        sr_ease_factor=2.5,
+        sr_repetition=0,
+        review_count=0,
+        correct_count=0,
+        mastery_percent=0,
+        difficulty_level=3,
+        tags=["math", "addition"],
+    )
+    db_session.add(flashcard)
+    await db_session.commit()
+    await db_session.refresh(flashcard)
+    return flashcard
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_flashcards(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subject: Any,
+) -> list[Any]:
+    """Create multiple sample flashcards in the database."""
+    from app.models.flashcard import Flashcard
+    import uuid
+
+    flashcards_data = [
+        {"front": "What is 2 + 2?", "back": "4", "difficulty_level": 1},
+        {"front": "What is 5 x 5?", "back": "25", "difficulty_level": 2},
+        {"front": "What is the square root of 16?", "back": "4", "difficulty_level": 3},
+        {"front": "What is 12 ÷ 4?", "back": "3", "difficulty_level": 2},
+        {"front": "What is 7 x 8?", "back": "56", "difficulty_level": 3},
+    ]
+
+    flashcards = []
+    for data in flashcards_data:
+        flashcard = Flashcard(
+            id=uuid.uuid4(),
+            student_id=sample_student.id,
+            subject_id=sample_subject.id,
+            front=data["front"],
+            back=data["back"],
+            generated_by="user",
+            sr_interval=1,
+            sr_ease_factor=2.5,
+            sr_repetition=0,
+            review_count=0,
+            correct_count=0,
+            mastery_percent=0,
+            difficulty_level=data["difficulty_level"],
+            tags=["math"],
+        )
+        db_session.add(flashcard)
+        flashcards.append(flashcard)
+
+    await db_session.commit()
+    for fc in flashcards:
+        await db_session.refresh(fc)
+    return flashcards
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_flashcards_multi_subject(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subjects: list[Any],
+) -> list[Any]:
+    """Create flashcards across multiple subjects in the database."""
+    from app.models.flashcard import Flashcard
+    import uuid
+
+    flashcards = []
+
+    for subject in sample_subjects:
+        for i in range(3):
+            flashcard = Flashcard(
+                id=uuid.uuid4(),
+                student_id=sample_student.id,
+                subject_id=subject.id,
+                front=f"{subject.code} Question {i + 1}?",
+                back=f"{subject.code} Answer {i + 1}",
+                generated_by="user",
+                sr_interval=1,
+                sr_ease_factor=2.5,
+                sr_repetition=0,
+                review_count=0,
+                correct_count=0,
+                mastery_percent=0,
+                difficulty_level=i + 1,
+                tags=[subject.code.lower()],
+            )
+            db_session.add(flashcard)
+            flashcards.append(flashcard)
+
+    await db_session.commit()
+    for fc in flashcards:
+        await db_session.refresh(fc)
+    return flashcards
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_note(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subject: Any,
+) -> Any:
+    """Create a sample note in the database."""
+    from app.models.note import Note
+    import uuid
+
+    note = Note(
+        id=uuid.uuid4(),
+        student_id=sample_student.id,
+        subject_id=sample_subject.id,
+        title="Photosynthesis Notes",
+        content_type="text",
+        ocr_text="Photosynthesis is the process by which plants convert sunlight into energy. "
+                 "Plants need sunlight, water, and carbon dioxide for photosynthesis. "
+                 "The process produces glucose and oxygen.",
+        ocr_status="completed",
+        tags=["science", "biology"],
+        note_metadata={"source": "test"},
+    )
+    db_session.add(note)
+    await db_session.commit()
+    await db_session.refresh(note)
+    return note

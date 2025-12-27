@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { TutorPage } from '@/pages/TutorPage'
 import { NotesPage } from '@/pages/NotesPage'
+import RevisionPage from '@/pages/RevisionPage'
 import { AuthGuard } from '@/features/auth/AuthGuard'
 
 function App() {
@@ -16,7 +17,11 @@ function App() {
             <TutorPage />
           </AuthGuard>
         } />
-        <Route path="/revision" element={<div>Revision</div>} />
+        <Route path="/revision" element={
+          <AuthGuard requireStudent>
+            <RevisionPage />
+          </AuthGuard>
+        } />
         <Route path="/notes" element={
           <AuthGuard requireStudent>
             <NotesPage />

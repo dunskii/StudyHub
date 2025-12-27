@@ -9,6 +9,8 @@ from app.models.student_subject import StudentSubject
 from app.models.note import Note
 from app.models.session import Session
 from app.models.ai_interaction import AIInteraction
+from app.models.flashcard import Flashcard
+from app.models.revision_history import RevisionHistory
 
 __all__ = [
     "CurriculumFramework",
@@ -21,4 +23,6 @@ __all__ = [
     "Note",
     "Session",
     "AIInteraction",
+    "Flashcard",
+    "RevisionHistory",
 ]

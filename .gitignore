@@ -74,3 +74,4 @@ service-account.json
 tmp/
 temp/
 *.tmp
+frontend/coverage/

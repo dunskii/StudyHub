@@ -24,6 +24,15 @@ aiofiles>=23.2.1
 # AI
 anthropic>=0.18.0
 
+# Storage (Digital Ocean Spaces / S3-compatible)
+boto3>=1.34.0
+
+# Image processing
+Pillow>=10.2.0
+
+# OCR (Google Cloud Vision)
+google-cloud-vision>=3.7.0
+
 # Rate limiting
 slowapi>=0.1.9
 

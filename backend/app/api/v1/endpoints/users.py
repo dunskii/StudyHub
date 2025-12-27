@@ -1,7 +1,8 @@
 """User endpoints for parent account management."""
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -13,9 +14,16 @@ from app.core.security import (
 )
 from app.schemas.student import StudentListResponse, StudentResponse
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.ai_interaction import (
+    AIInteractionListResponse,
+    AIInteractionResponse,
+    TokenUsageResponse,
+)
 from app.services.data_export_service import DataExportService
 from app.services.student_service import StudentService
 from app.services.user_service import UserService
+from app.services.ai_interaction_service import AIInteractionService
+from app.models.student import Student
 
 router = APIRouter()
 
@@ -231,3 +239,200 @@ async def export_user_data(
     """
     service = DataExportService(db)
     return await service.export_user_data(current_user.id)
+
+
+# =============================================================================
+# Parent AI Visibility Endpoints
+# =============================================================================
+
+
+@router.get("/me/students/{student_id}/ai-interactions", response_model=AIInteractionListResponse)
+async def get_child_ai_interactions(
+    student_id: UUID,
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    flagged_only: bool = Query(default=False, description="Only return flagged interactions"),
+    page: int = Query(default=1, ge=1, description="Page number"),
+    page_size: int = Query(default=20, ge=1, le=100, description="Items per page"),
+) -> AIInteractionListResponse:
+    """Get AI interactions for a child (parent oversight).
+
+    Parents can view their children's AI conversations for oversight,
+    not surveillance. This helps parents:
+    - Monitor learning progress
+    - Review flagged conversations
+    - Ensure appropriate AI interactions
+
+    Args:
+        student_id: The student (child) ID.
+        current_user: The authenticated parent.
+        db: Database session.
+        flagged_only: Whether to only return flagged interactions.
+        page: Page number (1-indexed).
+        page_size: Items per page.
+
+    Returns:
+        Paginated list of AI interactions.
+
+    Raises:
+        HTTPException: 403 if not the parent, 404 if student not found.
+    """
+    # Verify parent-child relationship
+    student = await db.get(Student, student_id)
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    if student.parent_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only view your own children's AI interactions",
+        )
+
+    # Get interactions
+    ai_service = AIInteractionService(db)
+    offset = (page - 1) * page_size
+
+    interactions, total = await ai_service.get_student_interactions(
+        student_id=student_id,
+        flagged_only=flagged_only,
+        limit=page_size,
+        offset=offset,
+    )
+
+    # Get flagged count
+    flagged_count = await ai_service.get_flagged_count(student_id)
+
+    return AIInteractionListResponse(
+        interactions=[
+            AIInteractionResponse.model_validate(i) for i in interactions
+        ],
+        total=total,
+        flagged_count=flagged_count,
+        limit=page_size,
+        offset=offset,
+    )
+
+
+@router.get("/me/students/{student_id}/ai-interactions/flagged", response_model=AIInteractionListResponse)
+async def get_child_flagged_interactions(
+    student_id: UUID,
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    page: int = Query(default=1, ge=1, description="Page number"),
+    page_size: int = Query(default=20, ge=1, le=100, description="Items per page"),
+) -> AIInteractionListResponse:
+    """Get flagged AI interactions for a child.
+
+    Convenience endpoint for quickly reviewing interactions that were
+    flagged for parent attention.
+
+    Args:
+        student_id: The student (child) ID.
+        current_user: The authenticated parent.
+        db: Database session.
+        page: Page number (1-indexed).
+        page_size: Items per page.
+
+    Returns:
+        Paginated list of flagged AI interactions.
+    """
+    # Verify parent-child relationship
+    student = await db.get(Student, student_id)
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    if student.parent_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only view your own children's AI interactions",
+        )
+
+    # Get flagged interactions
+    ai_service = AIInteractionService(db)
+    offset = (page - 1) * page_size
+
+    interactions, total = await ai_service.get_student_interactions(
+        student_id=student_id,
+        flagged_only=True,
+        limit=page_size,
+        offset=offset,
+    )
+
+    return AIInteractionListResponse(
+        interactions=[
+            AIInteractionResponse.model_validate(i) for i in interactions
+        ],
+        total=total,
+        flagged_count=total,  # All results are flagged
+        limit=page_size,
+        offset=offset,
+    )
+
+
+@router.get("/me/students/{student_id}/ai-usage", response_model=TokenUsageResponse)
+async def get_child_ai_usage(
+    student_id: UUID,
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    period: str = Query(default="today", description="Period: today, week, month, all_time"),
+) -> TokenUsageResponse:
+    """Get AI token usage statistics for a child.
+
+    Returns token usage and estimated cost for the specified period.
+
+    Args:
+        student_id: The student (child) ID.
+        current_user: The authenticated parent.
+        db: Database session.
+        period: Time period for statistics.
+
+    Returns:
+        Token usage statistics.
+    """
+    from datetime import datetime, timedelta, timezone
+
+    # Verify parent-child relationship
+    student = await db.get(Student, student_id)
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    if student.parent_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only view your own children's AI usage",
+        )
+
+    # Calculate since date based on period
+    now = datetime.now(timezone.utc)
+    since = None
+
+    if period == "today":
+        since = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif period == "week":
+        since = now - timedelta(days=7)
+    elif period == "month":
+        since = now - timedelta(days=30)
+    # else: all_time - since remains None
+
+    # Get usage
+    ai_service = AIInteractionService(db)
+    token_usage = await ai_service.get_student_token_usage(student_id, since)
+    cost = await ai_service.get_student_cost(student_id, since)
+
+    return TokenUsageResponse(
+        student_id=student_id,
+        input_tokens=token_usage["input_tokens"],
+        output_tokens=token_usage["output_tokens"],
+        total_tokens=token_usage["total_tokens"],
+        estimated_cost_usd=cost,
+        period=period,
+    )

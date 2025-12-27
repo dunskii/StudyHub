@@ -1,7 +1,7 @@
 # StudyHub Development Progress
 
-**Last Updated**: 2025-12-26
-**Overall Progress**: 40% (User System Complete)
+**Last Updated**: 2025-12-27
+**Overall Progress**: 75% (Revision & Spaced Repetition Complete + QA Hardening)
 
 ---
 
@@ -13,8 +13,8 @@
 | 1 | Foundation & Infrastructure | ✅ **COMPLETE** | 100% |
 | 2 | Core Curriculum System | ✅ **COMPLETE** | 100% |
 | 3 | User System & Auth | ✅ **COMPLETE** | 100% |
-| 4 | AI Tutoring | **NEXT** | 0% |
-| 5 | Notes & OCR | NOT STARTED | 0% |
+| 4 | AI Tutoring | ✅ **COMPLETE** | 100% |
+| 5 | Notes & OCR | ✅ **COMPLETE** | 100% |
 | 6 | Revision & Spaced Repetition | NOT STARTED | 0% |
 | 7 | Parent Dashboard | NOT STARTED | 0% |
 | 8 | Gamification & Engagement | NOT STARTED | 0% |
@@ -214,35 +214,185 @@
 
 ---
 
-## Phase 4: AI Tutoring
+## Phase 4: AI Tutoring ✅ COMPLETE (2025-12-27)
 
-### Claude Integration
-- [ ] Claude service with model routing
-- [ ] Subject-specific prompts
-- [ ] Socratic method implementation
-- [ ] Age-appropriate responses
-- [ ] Safety and logging
+### Claude Integration ✅
+- [x] ClaudeService with model routing (Sonnet 4 for complex, Haiku 3.5 for simple)
+- [x] Cost tracking and token usage monitoring
+- [x] Configurable daily token limits per student
 
-### Tutor Interface
-- [ ] Chat UI
-- [ ] Subject context display
-- [ ] Curriculum outcome linking
-- [ ] Conversation history
-- [ ] Parent visibility
+### Subject-Specific Tutor Prompts ✅
+- [x] Base Socratic tutor prompt (CRITICAL: never gives direct answers)
+- [x] Mathematics tutor (socratic_stepwise approach)
+- [x] English tutor (socratic_analytical approach)
+- [x] Science tutor (inquiry_based approach)
+- [x] HSIE tutor (socratic_analytical approach)
+- [x] PDHPE tutor (discussion_based approach)
+- [x] TAS tutor (project_based approach)
+- [x] Creative Arts tutor (creative_mentoring approach)
+- [x] Languages tutor (immersive approach)
+- [x] Age-appropriate language guidelines (Stage 2-6)
+
+### Backend Services ✅
+- [x] SessionService for session lifecycle management
+- [x] AIInteractionService for logging all AI exchanges
+- [x] ModerationService for safety and content flagging
+- [x] TutorPromptFactory for dynamic prompt generation
+
+### API Endpoints ✅
+- [x] POST /api/v1/socratic/chat (main tutoring endpoint)
+- [x] GET /api/v1/socratic/history/{session_id}
+- [x] POST /api/v1/socratic/flashcards
+- [x] POST /api/v1/socratic/summarise
+- [x] Session CRUD endpoints
+- [x] Parent AI visibility endpoints
+
+### Frontend Components ✅
+- [x] TutorChat (main container)
+- [x] ChatMessage with markdown rendering
+- [x] ChatInput with character limit
+- [x] TypingIndicator with animation
+- [x] SubjectContext header
+- [x] EmptyChat with suggested prompts
+- [x] ConversationHistory for past sessions
+- [x] TutorPage with subject selection
+
+### State Management ✅
+- [x] tutorStore (Zustand)
+- [x] useTutor hooks (React Query)
+- [x] API functions for tutor endpoints
+
+### Safety Features ✅
+- [x] Content moderation with distress detection
+- [x] Dishonesty pattern detection
+- [x] Off-topic redirect
+- [x] Inappropriate content flagging
+- [x] All AI interactions logged for parent review
 
 ---
 
-## Phase 4: Revision & Spaced Repetition
+## Phase 5: Notes & OCR ✅ COMPLETE (2025-12-27)
 
-- [ ] Flashcard generation from notes
-- [ ] SM-2 algorithm implementation
-- [ ] Revision session UI
-- [ ] Progress tracking
-- [ ] Subject-based revision
+### Backend Services ✅
+- [x] StorageService for Digital Ocean Spaces (S3-compatible)
+- [x] ImageProcessor for validation, resizing, thumbnails
+- [x] OCRService with Google Cloud Vision API
+- [x] MockOCRService for development/testing
+- [x] NoteService for CRUD and business logic
+- [x] Curriculum alignment via Claude AI (Haiku model)
+
+### API Endpoints ✅
+- [x] POST /api/v1/notes/upload-url (presigned URL generation)
+- [x] POST /api/v1/notes (create note after upload)
+- [x] GET /api/v1/notes (list with filters)
+- [x] GET /api/v1/notes/{id} (get details)
+- [x] PUT /api/v1/notes/{id} (update)
+- [x] DELETE /api/v1/notes/{id} (delete)
+- [x] POST /api/v1/notes/{id}/process-ocr (trigger OCR)
+- [x] GET /api/v1/notes/{id}/ocr-status (poll status)
+- [x] POST /api/v1/notes/{id}/align-curriculum (AI suggestions)
+- [x] PUT /api/v1/notes/{id}/outcomes (link outcomes)
+
+### Frontend Components ✅
+- [x] NoteCard with thumbnail, OCR status badge, tags
+- [x] NoteList with grid layout, loading/empty/error states
+- [x] NoteUpload with drag & drop, progress tracking
+- [x] NoteViewer with zoom, OCR text panel, actions
+- [x] OCRStatus badge component
+- [x] NotesPage with subject filters and search
+
+### State Management ✅
+- [x] noteStore (Zustand) for upload progress tracking
+- [x] useNotes hooks (React Query) with polling for OCR
+- [x] API functions for all note endpoints
+
+### Features ✅
+- [x] Presigned URL flow for direct browser uploads
+- [x] Background OCR processing
+- [x] Image validation (format, size, dimensions)
+- [x] Thumbnail generation
+- [x] Subject filtering with URL params
+- [x] Full-text search across notes
+- [x] Curriculum outcome alignment via AI
+
+### Dependencies ✅
+- [x] boto3 for S3-compatible storage
+- [x] Pillow for image processing
+- [x] google-cloud-vision for OCR
 
 ---
 
-## Phase 5: Parent Dashboard
+## Phase 6: Revision & Spaced Repetition ✅ COMPLETE (2025-12-27)
+
+### Backend Services ✅
+- [x] SpacedRepetitionService with SM-2 algorithm
+- [x] RevisionService for flashcard CRUD and sessions
+- [x] FlashcardGenerationService for AI-powered generation
+- [x] Flashcard and RevisionHistory SQLAlchemy models
+- [x] Database migrations 013_flashcards and 014_revision_history
+- [x] Pydantic schemas for flashcards and revision
+
+### API Endpoints ✅
+- [x] POST /api/v1/revision/flashcards (create)
+- [x] GET /api/v1/revision/flashcards (list with filters)
+- [x] GET /api/v1/revision/flashcards/{id} (get)
+- [x] PUT /api/v1/revision/flashcards/{id} (update)
+- [x] DELETE /api/v1/revision/flashcards/{id} (delete)
+- [x] POST /api/v1/revision/flashcards/generate (AI generation)
+- [x] POST /api/v1/revision/flashcards/bulk (bulk create)
+- [x] GET /api/v1/revision/due (due for review)
+- [x] POST /api/v1/revision/answer (submit answer)
+- [x] GET /api/v1/revision/progress (overall stats)
+- [x] GET /api/v1/revision/progress/by-subject (per-subject stats)
+- [x] GET /api/v1/revision/history (review history)
+
+### Frontend Components ✅
+- [x] FlashcardView with flip animation
+- [x] FlashcardList with grid/list toggle
+- [x] FlashcardCreator form
+- [x] GenerateFromNote AI generation UI
+- [x] RevisionSession with progress tracking
+- [x] RevisionProgress dashboard
+- [x] RevisionPage with tabbed navigation
+
+### State Management ✅
+- [x] revisionStore (Zustand) for session state
+- [x] useRevision hooks (React Query)
+- [x] API client functions
+
+### Features ✅
+- [x] SM-2 spaced repetition algorithm
+- [x] Flashcard generation from notes (Claude Haiku)
+- [x] Flashcard generation from curriculum outcomes
+- [x] Review session with correctness tracking
+- [x] Difficulty rating (1-5 scale)
+- [x] Mastery percentage calculation
+- [x] Subject-based progress tracking
+- [x] Review streak tracking
+
+### Tests ✅
+- [x] SpacedRepetitionService unit tests (SM-2 algorithm)
+- [x] revisionStore unit tests
+
+### Phase 6 QA Hardening ✅ (2025-12-27)
+Priority 1 and 2 recommendations from QA review:
+
+- [x] **Auth Integration (P1)**: All 12 revision endpoints require authentication
+- [x] **Ownership Verification (P1)**: `verify_student_access()` checks parent ownership
+- [x] **Rate Limiting (P1)**: GenerationRateLimiter (5/hour, 20/day per student)
+- [x] **Streak Bug Fix (P2)**: Fixed month boundary bug using timedelta
+- [x] **API Integration Tests (P2)**: 20 new tests for revision endpoints
+- [x] **Streak Unit Tests (P2)**: 4 tests for date boundary edge cases
+- [x] **Test Fixtures**: Added flashcard and note fixtures to conftest.py
+
+Test Results:
+- Backend: 300 tests passing
+- Frontend: 288 tests passing
+- New revision tests: 24 tests
+
+---
+
+## Phase 7: Parent Dashboard
 
 - [ ] Parent account management
 - [ ] Child progress overview
@@ -253,7 +403,7 @@
 
 ---
 
-## Phase 6: Gamification & Engagement
+## Phase 8: Gamification & Engagement
 
 - [ ] XP system per subject
 - [ ] Level progression
@@ -263,7 +413,7 @@
 
 ---
 
-## Phase 7: HSC/Senior Features
+## Phase 9: HSC/Senior Features
 
 - [ ] HSC course selection
 - [ ] Band prediction (stretch)
@@ -273,7 +423,7 @@
 
 ---
 
-## Phase 8: PWA & Offline
+## Phase 10: PWA & Offline
 
 - [ ] Service worker configuration
 - [ ] IndexedDB for offline data
@@ -283,7 +433,7 @@
 
 ---
 
-## Phase 9: Testing & Launch
+## Phase 11: Testing & Launch
 
 - [ ] Unit test coverage > 80%
 - [ ] E2E tests for critical paths
@@ -296,6 +446,122 @@
 ---
 
 ## Changelog
+
+### 2025-12-27 - Phase 6 QA Hardening Complete
+- **Phase 6 QA Priority 1 & 2 Recommendations: 100% COMPLETE**
+- Security hardening:
+  - All 12 revision endpoints now require authentication
+  - Ownership verification prevents cross-parent access (403 Forbidden)
+  - GenerationRateLimiter protects AI endpoint (5/hour, 20/day per student)
+  - Proper 404/403 differentiation prevents enumeration attacks
+- Bug fixes:
+  - Fixed streak calculation month boundary bug using timedelta
+  - Previously used `.replace(day=...)` which failed on Jan 1 → Dec 31
+- Test improvements:
+  - 20 new API integration tests for revision endpoints
+  - 4 new streak date calculation unit tests
+  - Added flashcard and note fixtures to conftest.py
+  - Backend tests: 276 → 300 (24 new tests)
+- Files modified:
+  - `backend/app/api/v1/endpoints/revision.py` (auth, rate limiting)
+  - `backend/app/services/revision_service.py` (streak fix)
+  - `backend/tests/conftest.py` (new fixtures)
+- Files created:
+  - `backend/tests/api/test_revision.py` (API tests)
+  - `md/study/priority-recommendations-1-and-2.md`
+  - `md/plan/priority-recommendations-1-and-2.md`
+  - `md/review/priority-recommendations-1-and-2.md`
+  - `md/report/priority-recommendations-1-and-2.md`
+- QA review: PASS - Production ready
+
+### 2025-12-27 - Phase 5 Complete
+- **Phase 5 Notes & OCR System: 100% COMPLETE**
+- Backend accomplishments:
+  - StorageService for Digital Ocean Spaces (S3-compatible)
+  - ImageProcessor for validation, resizing, and thumbnail generation
+  - OCRService with Google Cloud Vision API (document_text_detection)
+  - MockOCRService for development without credentials
+  - NoteService for CRUD operations and business logic
+  - Curriculum alignment using Claude AI (Haiku model)
+  - Pydantic schemas for all note operations
+  - 10 API endpoints for notes management
+  - Background task processing for async OCR
+  - Presigned URL flow for direct browser-to-S3 uploads
+- Frontend accomplishments:
+  - noteStore (Zustand) for upload progress tracking
+  - useNotes hooks (React Query) with OCR status polling
+  - NoteCard with thumbnail preview and status badge
+  - NoteList with grid layout and loading/empty/error states
+  - NoteUpload with drag & drop and progress bar
+  - NoteViewer with zoom controls and OCR text panel
+  - OCRStatus badge component
+  - NotesPage with subject filters and search
+  - Integrated into main app router at /notes
+- Dependencies added:
+  - boto3 for S3-compatible storage
+  - Pillow for image processing
+  - google-cloud-vision for OCR
+- Files created:
+  - `backend/app/services/storage_service.py`
+  - `backend/app/services/image_processor.py`
+  - `backend/app/services/ocr_service.py`
+  - `backend/app/services/note_service.py`
+  - `backend/app/schemas/note.py`
+  - `backend/app/api/v1/endpoints/notes.py`
+  - `frontend/src/lib/api/notes.ts`
+  - `frontend/src/stores/noteStore.ts`
+  - `frontend/src/hooks/useNotes.ts`
+  - `frontend/src/features/notes/` (6 files)
+  - `frontend/src/pages/NotesPage.tsx`
+- Ready for Phase 6: Revision & Spaced Repetition
+
+### 2025-12-27 - Phase 4 Complete
+- **Phase 4 AI Tutoring Foundation: 100% COMPLETE**
+- Backend accomplishments:
+  - ClaudeService with model routing (Sonnet 4/Haiku 3.5)
+  - SessionService for session lifecycle management
+  - AIInteractionService for logging all AI exchanges
+  - ModerationService for safety and content flagging
+  - 8 subject-specific tutor prompts with Socratic method
+  - Base tutor prompt with age-appropriate language guidelines
+  - TutorPromptFactory for dynamic prompt generation
+  - Pydantic schemas for Session and AIInteraction
+  - Socratic tutor API endpoints (chat, history, flashcards, summarise)
+  - Session management endpoints
+  - Parent AI visibility endpoints
+- Frontend accomplishments:
+  - tutorStore (Zustand) for state management
+  - useTutor hooks (React Query) for data fetching
+  - TutorChat main container component
+  - ChatMessage with markdown-like rendering
+  - ChatInput with character limit and Enter to send
+  - TypingIndicator with animated dots
+  - SubjectContext header with session timer
+  - EmptyChat with subject-specific suggested prompts
+  - ConversationHistory for viewing past sessions
+  - TutorPage with subject selection grid
+  - Integrated into main app router
+- Safety features:
+  - Content moderation with distress pattern detection
+  - Dishonesty detection (asking for answers)
+  - Off-topic conversation redirect
+  - Inappropriate content flagging
+  - All AI interactions logged for parent review
+- Files created:
+  - `backend/app/services/claude_service.py`
+  - `backend/app/services/session_service.py`
+  - `backend/app/services/ai_interaction_service.py`
+  - `backend/app/services/moderation_service.py`
+  - `backend/app/services/tutor_prompts/` (9 files)
+  - `backend/app/schemas/session.py`
+  - `backend/app/schemas/ai_interaction.py`
+  - `backend/app/api/v1/endpoints/socratic.py`
+  - `frontend/src/stores/tutorStore.ts`
+  - `frontend/src/lib/api/tutor.ts`
+  - `frontend/src/hooks/useTutor.ts`
+  - `frontend/src/features/socratic-tutor/` (7 files)
+  - `frontend/src/pages/TutorPage.tsx`
+- Ready for Phase 5: Notes & OCR
 
 ### 2025-12-26 - Phase 3 Complete
 - **Phase 3 User System & Auth: 100% COMPLETE**

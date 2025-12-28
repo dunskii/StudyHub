@@ -90,3 +90,34 @@ export type {
   CurriculumAlignmentResponse,
   NoteListParams,
 } from './notes'
+
+// Parent Dashboard API
+export { parentDashboardApi } from './parent-dashboard'
+export type {
+  DashboardStudentSummary,
+  DashboardOverview,
+  WeeklyStats,
+  StrandProgress,
+  SubjectProgress,
+  FoundationStrength,
+  StudentProgress,
+  InsightItem,
+  RecommendationItem,
+  PathwayReadiness,
+  HSCProjection,
+  WeeklyInsightsData,
+  WeeklyInsights,
+  Goal,
+  GoalProgress,
+  GoalWithProgress,
+  GoalListResponse,
+  Notification,
+  NotificationListResponse,
+  NotificationPreferences,
+  CreateGoalRequest,
+  UpdateGoalRequest,
+  UpdateNotificationPreferencesRequest,
+} from './parent-dashboard'
+
+// Revision API
+export { revisionApi } from './revision'

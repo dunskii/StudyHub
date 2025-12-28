@@ -63,14 +63,22 @@ class AppException(HTTPException):
 class NotFoundError(AppException):
     """Resource not found error."""
 
-    def __init__(self, resource: str, identifier: str | None = None):
+    def __init__(
+        self,
+        resource: str,
+        identifier: str | None = None,
+        hint: str | None = None,
+    ):
         # Sanitize - don't include user-provided identifier in message
-        message = f"{resource} not found"
+        message = f"{resource} not found or not accessible"
+        details: dict[str, Any] = {"resource_type": resource}
+        if hint:
+            details["hint"] = hint
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code=ErrorCode.NOT_FOUND,
             message=message,
-            details={"resource": resource} if identifier is None else None,
+            details=details if identifier is None else None,
         )
 
 

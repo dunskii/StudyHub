@@ -51,9 +51,31 @@ class StudentSubject(Base):
         },
     )
 
+    # Current focus outcomes
+    current_focus_outcomes: Mapped[list[str] | None] = mapped_column(
+        JSONB, default=None
+    )
+
+    # Last activity timestamp
+    last_activity_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
     # Relationships
     student: Mapped[Student] = relationship("Student", back_populates="subjects")
     subject: Mapped[Subject] = relationship(
         "Subject", back_populates="student_subjects"
     )
     senior_course: Mapped[SeniorCourse | None] = relationship("SeniorCourse")
+
+    @property
+    def mastery_level(self) -> float:
+        """Get overall mastery percentage from progress JSONB."""
+        if self.progress:
+            return float(self.progress.get("overallPercentage", 0))
+        return 0.0
+
+    @property
+    def xp_earned(self) -> int:
+        """Get XP earned from progress JSONB."""
+        if self.progress:
+            return int(self.progress.get("xpEarned", 0))
+        return 0

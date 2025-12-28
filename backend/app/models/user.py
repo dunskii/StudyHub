@@ -12,6 +12,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
 if TYPE_CHECKING:
+    from app.models.goal import Goal
+    from app.models.notification import Notification
+    from app.models.notification_preference import NotificationPreference
     from app.models.student import Student
 
 
@@ -66,4 +69,13 @@ class User(Base):
     # Relationships
     students: Mapped[list[Student]] = relationship(
         "Student", back_populates="parent", cascade="all, delete-orphan"
+    )
+    goals: Mapped[list[Goal]] = relationship(
+        "Goal", back_populates="parent", cascade="all, delete-orphan"
+    )
+    notifications: Mapped[list[Notification]] = relationship(
+        "Notification", back_populates="user", cascade="all, delete-orphan"
+    )
+    notification_preferences: Mapped[NotificationPreference | None] = relationship(
+        "NotificationPreference", back_populates="user", uselist=False, cascade="all, delete-orphan"
     )

@@ -5,6 +5,7 @@ from app.api.v1.endpoints import (
     curriculum,
     frameworks,
     notes,
+    parent_dashboard,
     revision,
     senior_courses,
     sessions,
@@ -74,4 +75,11 @@ api_router.include_router(
     revision.router,
     prefix="/revision",
     tags=["revision"],
+)
+
+# Parent dashboard endpoints
+api_router.include_router(
+    parent_dashboard.router,
+    prefix="/parent",
+    tags=["parent-dashboard"],
 )

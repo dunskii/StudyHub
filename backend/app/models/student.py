@@ -14,11 +14,14 @@ from app.core.database import Base
 if TYPE_CHECKING:
     from app.models.curriculum_framework import CurriculumFramework
     from app.models.flashcard import Flashcard
+    from app.models.goal import Goal
     from app.models.note import Note
+    from app.models.notification import Notification
     from app.models.revision_history import RevisionHistory
     from app.models.session import Session
     from app.models.student_subject import StudentSubject
     from app.models.user import User
+    from app.models.weekly_insight import WeeklyInsight
 
 
 class Student(Base):
@@ -95,4 +98,13 @@ class Student(Base):
     )
     revision_history: Mapped[list[RevisionHistory]] = relationship(
         "RevisionHistory", back_populates="student", cascade="all, delete-orphan"
+    )
+    goals: Mapped[list[Goal]] = relationship(
+        "Goal", back_populates="student", cascade="all, delete-orphan"
+    )
+    notifications: Mapped[list[Notification]] = relationship(
+        "Notification", back_populates="student", cascade="all, delete-orphan"
+    )
+    weekly_insights: Mapped[list[WeeklyInsight]] = relationship(
+        "WeeklyInsight", back_populates="student", cascade="all, delete-orphan"
     )

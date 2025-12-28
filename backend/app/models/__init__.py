@@ -11,6 +11,10 @@ from app.models.session import Session
 from app.models.ai_interaction import AIInteraction
 from app.models.flashcard import Flashcard
 from app.models.revision_history import RevisionHistory
+from app.models.goal import Goal
+from app.models.notification import Notification, NotificationType, NotificationPriority, DeliveryMethod
+from app.models.notification_preference import NotificationPreference, EmailFrequency, WeekDay
+from app.models.weekly_insight import WeeklyInsight
 
 __all__ = [
     "CurriculumFramework",
@@ -25,4 +29,14 @@ __all__ = [
     "AIInteraction",
     "Flashcard",
     "RevisionHistory",
+    # Phase 7: Parent Dashboard
+    "Goal",
+    "Notification",
+    "NotificationType",
+    "NotificationPriority",
+    "DeliveryMethod",
+    "NotificationPreference",
+    "EmailFrequency",
+    "WeekDay",
+    "WeeklyInsight",
 ]

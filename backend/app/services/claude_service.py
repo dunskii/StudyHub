@@ -183,8 +183,33 @@ class ClaudeService:
             logger.error("Claude connection error", extra={"error": str(e)})
             raise
         except APIError as e:
-            logger.error("Claude API error", extra={"error": str(e), "status_code": e.status_code})
+            logger.error("Claude API error", extra={"error": str(e)})
             raise
+
+    async def generate(
+        self,
+        prompt: str,
+        system_prompt: str,
+        task_type: TaskType = TaskType.SUMMARY,
+        max_tokens: int | None = None,
+    ) -> AIResponse:
+        """Simple prompt-based generation (wrapper around chat).
+
+        Args:
+            prompt: The user prompt.
+            system_prompt: The system prompt defining AI behaviour.
+            task_type: Type of task for model routing.
+            max_tokens: Maximum tokens in response.
+
+        Returns:
+            AIResponse with content and metadata.
+        """
+        return await self.chat(
+            system_prompt=system_prompt,
+            messages=[{"role": "user", "content": prompt}],
+            task_type=task_type,
+            max_tokens=max_tokens,
+        )
 
     async def generate_flashcards(
         self,

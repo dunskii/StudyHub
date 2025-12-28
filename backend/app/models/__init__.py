@@ -15,6 +15,7 @@ from app.models.goal import Goal
 from app.models.notification import Notification, NotificationType, NotificationPriority, DeliveryMethod
 from app.models.notification_preference import NotificationPreference, EmailFrequency, WeekDay
 from app.models.weekly_insight import WeeklyInsight
+from app.models.achievement_definition import AchievementDefinition
 
 __all__ = [
     "CurriculumFramework",
@@ -39,4 +40,6 @@ __all__ = [
     "EmailFrequency",
     "WeekDay",
     "WeeklyInsight",
+    # Phase 8: Gamification
+    "AchievementDefinition",
 ]

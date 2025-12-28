@@ -675,3 +675,381 @@ async def sample_note(
     await db_session.commit()
     await db_session.refresh(note)
     return note
+
+
+# =============================================================================
+# Gamification Test Fixtures
+# =============================================================================
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_session(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subject: Any,
+) -> Any:
+    """Create a perfect revision session (100% correct) in the database."""
+    from app.models.session import Session
+    from datetime import datetime, timezone, timedelta
+    import uuid
+
+    started = datetime.now(timezone.utc) - timedelta(minutes=15)
+    ended = datetime.now(timezone.utc)
+
+    session = Session(
+        id=uuid.uuid4(),
+        student_id=sample_student.id,
+        subject_id=sample_subject.id,
+        session_type="revision",
+        started_at=started,
+        ended_at=ended,
+        duration_minutes=15,
+        xp_earned=75,
+        data={
+            "outcomesWorkedOn": ["MA3-RN-01", "MA3-MR-01"],
+            "questionsAttempted": 10,
+            "questionsCorrect": 10,  # Perfect session
+            "flashcardsReviewed": 5,
+        },
+    )
+    db_session.add(session)
+    await db_session.commit()
+    await db_session.refresh(session)
+    return session
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_imperfect_session(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subject: Any,
+) -> Any:
+    """Create an imperfect revision session (70% correct) in the database."""
+    from app.models.session import Session
+    from datetime import datetime, timezone, timedelta
+    import uuid
+
+    started = datetime.now(timezone.utc) - timedelta(minutes=20)
+    ended = datetime.now(timezone.utc)
+
+    session = Session(
+        id=uuid.uuid4(),
+        student_id=sample_student.id,
+        subject_id=sample_subject.id,
+        session_type="revision",
+        started_at=started,
+        ended_at=ended,
+        duration_minutes=20,
+        xp_earned=50,
+        data={
+            "outcomesWorkedOn": ["MA3-RN-01"],
+            "questionsAttempted": 10,
+            "questionsCorrect": 7,  # 70% correct - not perfect
+            "flashcardsReviewed": 8,
+        },
+    )
+    db_session.add(session)
+    await db_session.commit()
+    await db_session.refresh(session)
+    return session
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_tutor_session(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subject: Any,
+) -> Any:
+    """Create a tutor chat session in the database."""
+    from app.models.session import Session
+    from datetime import datetime, timezone, timedelta
+    import uuid
+
+    started = datetime.now(timezone.utc) - timedelta(minutes=25)
+    ended = datetime.now(timezone.utc)
+
+    session = Session(
+        id=uuid.uuid4(),
+        student_id=sample_student.id,
+        subject_id=sample_subject.id,
+        session_type="tutor_chat",
+        started_at=started,
+        ended_at=ended,
+        duration_minutes=25,
+        xp_earned=60,
+        data={
+            "outcomesWorkedOn": ["MA3-RN-01"],
+            "questionsAttempted": 0,
+            "questionsCorrect": 0,
+            "flashcardsReviewed": 0,
+            "messagesExchanged": 12,
+        },
+    )
+    db_session.add(session)
+    await db_session.commit()
+    await db_session.refresh(session)
+    return session
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_achievement_definition(db_session: AsyncSession) -> Any:
+    """Create a sample achievement definition in the database."""
+    from app.models.achievement_definition import AchievementDefinition
+    import uuid
+
+    achievement = AchievementDefinition(
+        id=uuid.uuid4(),
+        code="first_session",
+        name="First Steps",
+        description="Complete your first study session",
+        category="engagement",
+        subject_code=None,
+        requirements={"sessions_completed": 1},
+        xp_reward=50,
+        icon="star",
+        is_active=True,
+    )
+    db_session.add(achievement)
+    await db_session.commit()
+    await db_session.refresh(achievement)
+    return achievement
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_achievement_definitions(db_session: AsyncSession) -> list[Any]:
+    """Create multiple achievement definitions in the database."""
+    from app.models.achievement_definition import AchievementDefinition
+    import uuid
+
+    achievements_data = [
+        {
+            "code": "first_session",
+            "name": "First Steps",
+            "description": "Complete your first study session",
+            "category": "engagement",
+            "requirements": {"sessions_completed": 1},
+            "xp_reward": 50,
+            "icon": "star",
+        },
+        {
+            "code": "week_streak",
+            "name": "Week Warrior",
+            "description": "Maintain a 7-day study streak",
+            "category": "streak",
+            "requirements": {"streak_days": 7},
+            "xp_reward": 100,
+            "icon": "flame",
+        },
+        {
+            "code": "level_5",
+            "name": "Scholar",
+            "description": "Reach level 5",
+            "category": "level",
+            "requirements": {"level": 5},
+            "xp_reward": 150,
+            "icon": "trophy",
+        },
+        {
+            "code": "xp_master",
+            "name": "XP Master",
+            "description": "Earn 1000 total XP",
+            "category": "xp",
+            "requirements": {"total_xp": 1000},
+            "xp_reward": 100,
+            "icon": "gem",
+        },
+        {
+            "code": "perfect_five",
+            "name": "Perfect Five",
+            "description": "Complete 5 perfect sessions (100% correct)",
+            "category": "mastery",
+            "requirements": {"perfect_sessions": 5},
+            "xp_reward": 200,
+            "icon": "sparkles",
+        },
+        {
+            "code": "outcome_explorer",
+            "name": "Outcome Explorer",
+            "description": "Master 10 curriculum outcomes",
+            "category": "curriculum",
+            "requirements": {"outcomes_mastered": 10},
+            "xp_reward": 150,
+            "icon": "compass",
+        },
+        {
+            "code": "flashcard_fan",
+            "name": "Flashcard Fan",
+            "description": "Review 100 flashcards",
+            "category": "revision",
+            "requirements": {"flashcards_reviewed": 100},
+            "xp_reward": 75,
+            "icon": "layers",
+        },
+        {
+            "code": "math_champion",
+            "name": "Math Champion",
+            "description": "Complete 20 maths sessions",
+            "category": "subject",
+            "subject_code": "MATH",
+            "requirements": {"subject_sessions": {"MATH": 20}},
+            "xp_reward": 100,
+            "icon": "calculator",
+        },
+    ]
+
+    achievements = []
+    for data in achievements_data:
+        achievement = AchievementDefinition(
+            id=uuid.uuid4(),
+            is_active=True,
+            **data,
+        )
+        db_session.add(achievement)
+        achievements.append(achievement)
+
+    await db_session.commit()
+    for ach in achievements:
+        await db_session.refresh(ach)
+    return achievements
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_student_subject_with_outcomes(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subject: Any,
+) -> Any:
+    """Create a student subject enrolment with completed outcomes."""
+    from app.models.student_subject import StudentSubject
+    from datetime import datetime, timezone
+    import uuid
+
+    student_subject = StudentSubject(
+        id=uuid.uuid4(),
+        student_id=sample_student.id,
+        subject_id=sample_subject.id,
+        pathway=None,
+        progress={
+            "outcomesCompleted": ["MA3-RN-01", "MA3-RN-02", "MA3-GM-01"],
+            "outcomesInProgress": ["MA3-MR-01"],
+            "overallPercentage": 45,
+            "lastActivity": datetime.now(timezone.utc).isoformat(),
+            "xpEarned": 250,
+        },
+        last_activity_at=datetime.now(timezone.utc),
+    )
+    db_session.add(student_subject)
+    await db_session.commit()
+    await db_session.refresh(student_subject)
+    return student_subject
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_student_subjects_multi(
+    db_session: AsyncSession,
+    sample_student: Any,
+    sample_subjects: list[Any],
+) -> list[Any]:
+    """Create student subject enrolments across multiple subjects with outcomes."""
+    from app.models.student_subject import StudentSubject
+    from datetime import datetime, timezone
+    import uuid
+
+    outcomes_data = [
+        # MATH - 3 outcomes mastered
+        {
+            "outcomesCompleted": ["MA3-RN-01", "MA3-RN-02", "MA3-MR-01"],
+            "outcomesInProgress": ["MA3-GM-01"],
+            "overallPercentage": 60,
+            "xpEarned": 300,
+        },
+        # ENG - 2 outcomes mastered
+        {
+            "outcomesCompleted": ["EN3-VOCAB-01", "EN3-SPELL-01"],
+            "outcomesInProgress": ["EN3-GRAM-01"],
+            "overallPercentage": 40,
+            "xpEarned": 200,
+        },
+        # SCI - 2 outcomes mastered (1 overlapping code for uniqueness test)
+        {
+            "outcomesCompleted": ["SC3-WS-01", "SC3-LW-01"],
+            "outcomesInProgress": [],
+            "overallPercentage": 50,
+            "xpEarned": 150,
+        },
+    ]
+
+    student_subjects = []
+    for i, subject in enumerate(sample_subjects):
+        student_subject = StudentSubject(
+            id=uuid.uuid4(),
+            student_id=sample_student.id,
+            subject_id=subject.id,
+            pathway=None,
+            progress={
+                **outcomes_data[i],
+                "lastActivity": datetime.now(timezone.utc).isoformat(),
+            },
+            last_activity_at=datetime.now(timezone.utc),
+        )
+        db_session.add(student_subject)
+        student_subjects.append(student_subject)
+
+    await db_session.commit()
+    for ss in student_subjects:
+        await db_session.refresh(ss)
+    return student_subjects
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sample_gamification_student(
+    db_session: AsyncSession,
+    sample_user: Any,
+    sample_framework: Any,
+) -> Any:
+    """Create a student with pre-populated gamification data for testing."""
+    from app.models.student import Student
+    from datetime import date, timedelta
+    import uuid
+
+    student = Student(
+        id=uuid.uuid4(),
+        parent_id=sample_user.id,
+        display_name="Gamification Test Student",
+        grade_level=5,
+        school_stage="S3",
+        framework_id=sample_framework.id,
+        preferences={
+            "theme": "auto",
+            "studyReminders": True,
+            "dailyGoalMinutes": 30,
+            "language": "en-AU",
+        },
+        gamification={
+            "totalXP": 500,
+            "level": 4,
+            "achievements": [
+                {
+                    "id": "first_session",
+                    "name": "First Steps",
+                    "category": "engagement",
+                    "xpReward": 50,
+                    "unlockedAt": "2025-01-15T10:30:00Z",
+                },
+            ],
+            "streaks": {
+                "current": 5,
+                "longest": 10,
+                "lastActiveDate": (date.today() - timedelta(days=1)).isoformat(),
+            },
+            "dailyXPEarned": {
+                "date": date.today().isoformat(),
+                "session_complete": 50,
+                "flashcard_review": 20,
+            },
+        },
+    )
+    db_session.add(student)
+    await db_session.commit()
+    await db_session.refresh(student)
+    return student

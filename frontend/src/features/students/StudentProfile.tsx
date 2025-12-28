@@ -1,13 +1,20 @@
 /**
  * StudentProfile - Displays and allows editing of student profile information.
+ *
+ * Includes gamification display with level badge, XP progress, and streak counter.
  */
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Award } from 'lucide-react';
 import { useUpdateStudent } from '@/hooks';
+import { useGamificationStats } from '@/hooks/useGamification';
 import { Button, Input, Label, Card } from '@/components/ui';
+import { LevelBadge } from '@/features/gamification/components/LevelBadge';
+import { XPBar } from '@/features/gamification/components/XPBar';
+import { StreakCounter } from '@/features/gamification/components/StreakCounter';
 import type { Student } from '@/types/student.types';
 
 const STAGE_NAMES: Record<string, string> = {
@@ -59,6 +66,7 @@ export function StudentProfile({ student, onUpdate }: StudentProfileProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const updateStudent = useUpdateStudent();
+  const { data: gamificationStats } = useGamificationStats(student.id);
 
   const {
     register,
@@ -205,24 +213,57 @@ export function StudentProfile({ student, onUpdate }: StudentProfileProps) {
             </dd>
           </div>
 
-          <div>
-            <dt className="text-sm text-gray-500">Level</dt>
-            <dd className="font-medium">
-              Level {student.gamification.level} ({student.gamification.totalXP} XP)
-            </dd>
-          </div>
+          {/* Gamification Section */}
+          <div className="border-t border-gray-100 pt-4 mt-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+              <Award className="w-4 h-4" aria-hidden="true" />
+              Progress
+            </h3>
 
-          <div>
-            <dt className="text-sm text-gray-500">Current streak</dt>
-            <dd className="font-medium">
-              {student.gamification.streaks.current} days
-              {student.gamification.streaks.longest > 0 && (
-                <span className="text-gray-500">
-                  {' '}
-                  (best: {student.gamification.streaks.longest})
-                </span>
-              )}
-            </dd>
+            {/* Level and XP */}
+            <div className="flex items-center gap-4 mb-4">
+              <LevelBadge
+                level={gamificationStats?.level ?? student.gamification.level}
+                title={gamificationStats?.levelTitle}
+                size="lg"
+                showTitle
+              />
+              <div className="flex-1">
+                {gamificationStats ? (
+                  <XPBar
+                    currentXp={gamificationStats.totalXp}
+                    levelStartXp={0}
+                    nextLevelXp={gamificationStats.nextLevelXp ?? 0}
+                    progressPercent={gamificationStats.levelProgressPercent}
+                    size="md"
+                  />
+                ) : (
+                  <div className="text-sm text-gray-600">
+                    {student.gamification.totalXP.toLocaleString()} XP
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Streak */}
+            <div>
+              <StreakCounter
+                current={gamificationStats?.streak.current ?? student.gamification.streaks.current}
+                longest={gamificationStats?.streak.longest ?? student.gamification.streaks.longest}
+                multiplier={gamificationStats?.streak.multiplier}
+                size="md"
+                showLongest
+                showMultiplier
+              />
+            </div>
+
+            {/* Achievements count */}
+            {gamificationStats && (
+              <div className="mt-3 text-sm text-gray-600">
+                <Award className="w-4 h-4 inline mr-1" aria-hidden="true" />
+                {gamificationStats.achievementsUnlocked} / {gamificationStats.achievementsTotal} achievements unlocked
+              </div>
+            )}
           </div>
         </dl>
       )}

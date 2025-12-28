@@ -95,6 +95,30 @@ export interface SessionResponse {
   subject_name?: string
 }
 
+export interface GamificationResult {
+  xpAwarded: number
+  multiplier: number
+  newTotalXp: number
+  oldLevel: number
+  newLevel: number
+  leveledUp: boolean
+  newLevelTitle?: string
+  streakUpdated: boolean
+  currentStreak: number
+  achievementsUnlocked: {
+    code: string
+    name: string
+    description: string
+    xpReward: number
+    category: string
+    icon: string
+  }[]
+}
+
+export interface SessionCompleteResponse extends SessionResponse {
+  gamification?: GamificationResult
+}
+
 export interface SessionListResponse {
   sessions: SessionResponse[]
   total: number
@@ -166,6 +190,51 @@ export async function endSession(sessionId: string, xpEarned = 0): Promise<Sessi
 }
 
 /**
+ * Complete a session and get gamification results.
+ *
+ * Returns XP earned, level changes, streak updates, and achievements unlocked.
+ */
+export async function completeSession(
+  sessionId: string,
+  xpEarned = 0
+): Promise<SessionCompleteResponse> {
+  const response = await api.post(`/api/v1/sessions/${sessionId}/complete`, {
+    xp_earned: xpEarned,
+  })
+
+  // Transform snake_case to camelCase for gamification result
+  if (response.gamification) {
+    const g = response.gamification
+    return {
+      ...response,
+      gamification: {
+        xpAwarded: g.xp_awarded,
+        multiplier: g.multiplier,
+        newTotalXp: g.new_total_xp,
+        oldLevel: g.old_level,
+        newLevel: g.new_level,
+        leveledUp: g.leveled_up,
+        newLevelTitle: g.new_level_title,
+        streakUpdated: g.streak_updated,
+        currentStreak: g.current_streak,
+        achievementsUnlocked: (g.achievements_unlocked || []).map(
+          (a: Record<string, unknown>) => ({
+            code: a.code,
+            name: a.name,
+            description: a.description,
+            xpReward: a.xp_reward,
+            category: a.category,
+            icon: a.icon,
+          })
+        ),
+      },
+    }
+  }
+
+  return response
+}
+
+/**
  * Get sessions for a student.
  */
 export async function getStudentSessions(
@@ -211,6 +280,7 @@ export const tutorApi = {
   createSession,
   getSession,
   endSession,
+  completeSession,
   getStudentSessions,
   getActiveSession,
 }

@@ -2,9 +2,9 @@
 
 **Single source of truth for all development tasks.**
 
-**Last Updated**: 2025-12-28
+**Last Updated**: 2025-12-29
 **Current Phase**: 8 - Gamification & Engagement
-**Overall Progress**: ~80%
+**Overall Progress**: ~85%
 
 ---
 
@@ -20,37 +20,40 @@
 | 5 | Notes and OCR | ✅ COMPLETE | 100% |
 | 6 | Revision System | ✅ COMPLETE | 100% |
 | 7 | Parent Dashboard | ✅ COMPLETE | 100% |
-| 8 | Gamification | **NEXT** | 0% |
+| 8 | Gamification | **IN PROGRESS** | 75% |
 | 9 | PWA/Offline & Launch | NOT STARTED | 0% |
 
 ---
 
-## Current Sprint - Phase 8 Kickoff
+## Current Sprint - Phase 8 Gamification
 
-### Priority 1: XP System
-- [ ] Create XP calculation logic per subject
-- [ ] Add XP model and database migration
-- [ ] Implement XP earning on session completion
-- [ ] Create XP endpoints (GET stats, GET history)
+### Backend Services ✅ COMPLETE
+- [x] XPService with daily caps and streak multipliers
+- [x] LevelService with 20-level progression (100 XP → Level 2, up to 50K XP → Level 20)
+- [x] StreakService with milestone detection (7, 14, 30, 60, 90, 180, 365 days)
+- [x] AchievementService with progress tracking
+- [x] GamificationService (orchestration)
+- [x] ActivityType enum and XP_RULES configuration
+- [x] AchievementDefinition model and migration
 
-### Priority 2: Level Progression
-- [ ] Design level thresholds and tier system
-- [ ] Create level progression service
-- [ ] Implement level-up notifications
-- [ ] Add level display to student profile
+### Test Infrastructure ✅ COMPLETE
+- [x] 67 tests passing (58 unit + 9 integration)
+- [x] 8 gamification fixtures in conftest.py
+- [x] 4 mock helper functions (mock_student_query, mock_session_query, etc.)
+- [x] JSONB integration tests for perfect_sessions, outcomes_mastered, daily XP
 
-### Priority 3: Achievements
-- [ ] Define achievement types and criteria
-- [ ] Create achievement model and migration
-- [ ] Implement achievement unlocking logic
-- [ ] Build achievement notification system
+### Up Next: API Endpoints
+- [ ] GET /api/v1/gamification/stats (XP, level, streak, achievements)
+- [ ] GET /api/v1/gamification/achievements (unlocked + progress)
+- [ ] POST /api/v1/gamification/on-session-complete (trigger XP/achievements)
+- [ ] GET /api/v1/gamification/leaderboard (optional, privacy-respecting)
 
-### Up Next (Phase 8 Week 2)
-- [ ] Build XPBar component
-- [ ] Build LevelBadge component
-- [ ] Build AchievementCard component
-- [ ] Build StreakCounter component
-- [ ] Build CelebrationAnimation component
+### Up Next: Frontend Components
+- [ ] XPBar component with animation
+- [ ] LevelBadge component with tier icons
+- [ ] AchievementCard component with progress
+- [ ] StreakCounter component with flame icon
+- [ ] CelebrationAnimation component (confetti)
 
 ---
 
@@ -314,18 +317,23 @@
 
 ---
 
-## Phase 8: Gamification
+## Phase 8: Gamification ✅ BACKEND COMPLETE (2025-12-29)
 
-### 8.1 Backend
-- [ ] XP calculation logic (per subject)
-- [ ] Level progression system
-- [ ] Achievement definitions
-- [ ] Streak tracking
+### 8.1 Backend ✅ COMPLETE
+- [x] XP calculation logic (per subject, with daily caps)
+- [x] Level progression system (20 levels, 1.5x XP per level)
+- [x] Achievement definitions (AchievementDefinition model)
+- [x] Streak tracking (with milestones and multipliers)
+- [x] GamificationService orchestration
+- [x] Test infrastructure (67 tests passing)
+
+### 8.2 API Endpoints (NOT STARTED)
 - [ ] GET /api/v1/gamification/stats
 - [ ] GET /api/v1/gamification/achievements
+- [ ] POST /api/v1/gamification/on-session-complete
 - [ ] GET /api/v1/gamification/leaderboard (optional)
 
-### 8.2 Frontend
+### 8.3 Frontend (NOT STARTED)
 - [ ] XPBar component
 - [ ] LevelBadge component
 - [ ] AchievementCard component
@@ -393,6 +401,16 @@
 ---
 
 ## Completed Tasks Log
+
+### 2025-12-29 - Phase 8 Test Infrastructure Complete
+- [x] Fixed 5 method signature mismatches in test_gamification_services.py
+- [x] Added 8 gamification fixtures to conftest.py
+- [x] Added 25 new unit tests across 5 test classes
+- [x] Added 4 mock helper functions (mock_student_query, mock_session_query, etc.)
+- [x] Created test_gamification_integration.py with 9 integration tests
+- [x] All 67 tests passing in 3.44s
+- [x] QA review: PASS
+- [x] Work report: `md/report/test-infrastructure-fixes.md`
 
 ### 2025-12-26 - Phase 3 Complete
 - [x] UserService, StudentService, StudentSubjectService

@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     curriculum,
     frameworks,
+    gamification,
     notes,
     parent_dashboard,
     revision,
@@ -82,4 +83,10 @@ api_router.include_router(
     parent_dashboard.router,
     prefix="/parent",
     tags=["parent-dashboard"],
+)
+
+# Gamification endpoints
+api_router.include_router(
+    gamification.router,
+    tags=["gamification"],
 )

@@ -127,7 +127,7 @@ class GoalService:
         )
 
         if active_only:
-            query = query.where(Goal.is_active == True)  # noqa: E712
+            query = query.where(Goal.is_active.is_(True))
 
         # Get total count
         count_query = (
@@ -136,7 +136,7 @@ class GoalService:
             .where(Goal.parent_id == parent_id)
         )
         if active_only:
-            count_query = count_query.where(Goal.is_active == True)  # noqa: E712
+            count_query = count_query.where(Goal.is_active.is_(True))
         count_result = await self.db.execute(count_query)
         total = count_result.scalar() or 0
 
@@ -164,7 +164,7 @@ class GoalService:
         query = select(Goal).where(Goal.parent_id == parent_id)
 
         if active_only:
-            query = query.where(Goal.is_active == True)  # noqa: E712
+            query = query.where(Goal.is_active.is_(True))
 
         query = query.order_by(Goal.created_at.desc())
         result = await self.db.execute(query)
@@ -498,7 +498,7 @@ class GoalService:
         result = await self.db.execute(
             select(func.count(Goal.id))
             .where(Goal.parent_id == parent_id)
-            .where(Goal.is_active == True)  # noqa: E712
+            .where(Goal.is_active.is_(True))
         )
         return result.scalar() or 0
 

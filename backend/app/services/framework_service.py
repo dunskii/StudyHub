@@ -97,7 +97,7 @@ class FrameworkService:
             The default framework or None if not found.
         """
         result = await self.db.execute(
-            select(CurriculumFramework).where(CurriculumFramework.is_default == True)  # noqa: E712
+            select(CurriculumFramework).where(CurriculumFramework.is_default.is_(True))
         )
         return result.scalar_one_or_none()
 

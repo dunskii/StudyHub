@@ -7,6 +7,7 @@ These endpoints handle:
 - Listing student sessions
 
 All endpoints require authentication and verify ownership.
+Integrates with gamification system for XP and achievements on session completion.
 """
 from __future__ import annotations
 
@@ -26,7 +27,9 @@ from app.schemas import (
     SessionResponse,
     SessionStatsUpdate,
 )
+from app.schemas.gamification import SessionGamificationResult
 from app.services.session_service import SessionService
+from app.services.gamification_service import GamificationService
 from app.models.student import Student
 from app.models.subject import Subject
 
@@ -178,6 +181,7 @@ async def end_session(
     """End a tutoring session.
 
     Calculates duration and records XP earned.
+    Triggers gamification updates (XP, streak, achievements).
     Requires authentication. Session must belong to current user's student.
 
     Args:
@@ -207,6 +211,24 @@ async def end_session(
         session_id=session_id,
         xp_earned=request.xp_earned,
     )
+
+    if session:
+        # Trigger gamification updates
+        try:
+            gamification_service = GamificationService(db)
+            await gamification_service.on_session_complete(
+                student_id=session.student_id,
+                session_type=session.session_type,
+                subject_id=session.subject_id,
+                duration_minutes=session.duration_minutes or 0,
+                questions_correct=session.data.get("questionsCorrect", 0) if session.data else 0,
+                flashcards_reviewed=session.data.get("flashcardsReviewed", 0) if session.data else 0,
+            )
+        except Exception as e:
+            # Log but don't fail the request if gamification update fails
+            logger.warning(
+                f"Failed to update gamification for session {session_id}: {e}"
+            )
 
     # Get subject for response
     subject = None
@@ -365,3 +387,92 @@ async def get_active_session(
         subject = await db.get(Subject, session.subject_id)
 
     return session_to_response(session, subject)
+
+
+class SessionEndWithGamificationResponse(SessionResponse):
+    """Session response with gamification results."""
+
+    gamification: SessionGamificationResult | None = None
+
+
+@router.post(
+    "/{session_id}/complete",
+    response_model=SessionEndWithGamificationResponse,
+)
+async def complete_session_with_gamification(
+    session_id: UUID,
+    request: SessionEndRequest,
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> SessionEndWithGamificationResponse:
+    """End a session and return gamification results.
+
+    This is an enhanced version of end_session that returns XP earned,
+    level changes, streak updates, and achievements unlocked.
+
+    Requires authentication. Session must belong to current user's student.
+
+    Args:
+        session_id: The session ID.
+        request: SessionEndRequest with xp_earned.
+        current_user: The authenticated parent.
+        db: Database session.
+
+    Returns:
+        SessionEndWithGamificationResponse with session and gamification data.
+    """
+    # First get the session to verify ownership
+    session_service = SessionService(db)
+    session = await session_service.get_session(session_id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Session not found",
+        )
+
+    # Verify ownership
+    await verify_student_ownership(session.student_id, current_user, db)
+
+    # Check if session already ended
+    if session.ended_at:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Session has already ended",
+        )
+
+    # Now end the session
+    session = await session_service.end_session(
+        session_id=session_id,
+        xp_earned=request.xp_earned,
+    )
+
+    gamification_result = None
+    if session:
+        # Trigger gamification updates and get results
+        try:
+            gamification_service = GamificationService(db)
+            gamification_result = await gamification_service.on_session_complete(
+                student_id=session.student_id,
+                session_type=session.session_type,
+                subject_id=session.subject_id,
+                duration_minutes=session.duration_minutes or 0,
+                questions_correct=session.data.get("questionsCorrect", 0) if session.data else 0,
+                flashcards_reviewed=session.data.get("flashcardsReviewed", 0) if session.data else 0,
+            )
+        except Exception as e:
+            logger.warning(
+                f"Failed to update gamification for session {session_id}: {e}"
+            )
+
+    # Get subject for response
+    subject = None
+    if session and session.subject_id:
+        subject = await db.get(Subject, session.subject_id)
+
+    base_response = session_to_response(session, subject)  # type: ignore[arg-type]
+
+    return SessionEndWithGamificationResponse(
+        **base_response.model_dump(),
+        gamification=gamification_result,
+    )

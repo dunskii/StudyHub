@@ -41,7 +41,8 @@ describe('StreakCounter', () => {
   it('displays multiplier when showMultiplier is true', () => {
     render(<StreakCounter current={7} multiplier={1.2} showMultiplier />);
 
-    expect(screen.getByText(/1\.2x/)).toBeInTheDocument();
+    // Component shows "{multiplier.toFixed(1)}x XP"
+    expect(screen.getByText(/1\.2x XP/)).toBeInTheDocument();
   });
 
   it('hides multiplier when showMultiplier is false', () => {
@@ -70,19 +71,19 @@ describe('StreakCounter', () => {
       <StreakCounter current={5} size="sm" />
     );
 
-    // Small size
-    let counter = container.firstChild as HTMLElement;
-    expect(counter.className).toMatch(/text-sm|text-lg|text-xl|text-2xl/);
+    // Small size - check for text-sm class on inner elements
+    let innerText = container.querySelector('[class*="text-sm"]');
+    expect(innerText).toBeInTheDocument();
 
-    // Medium size
+    // Medium size - check for text-lg class
     rerender(<StreakCounter current={5} size="md" />);
-    counter = container.firstChild as HTMLElement;
-    expect(counter).toBeInTheDocument();
+    innerText = container.querySelector('[class*="text-lg"]');
+    expect(innerText).toBeInTheDocument();
 
-    // Large size
+    // Large size - check for text-2xl class
     rerender(<StreakCounter current={5} size="lg" />);
-    counter = container.firstChild as HTMLElement;
-    expect(counter).toBeInTheDocument();
+    innerText = container.querySelector('[class*="text-2xl"]');
+    expect(innerText).toBeInTheDocument();
   });
 
   it('applies custom className', () => {

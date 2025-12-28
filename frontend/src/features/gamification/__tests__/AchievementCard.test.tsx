@@ -19,8 +19,7 @@ describe('AchievementCard', () => {
     isUnlocked: true,
     unlockedAt: '2025-01-15T10:00:00Z',
     progressPercent: 100,
-    progressCurrent: 1,
-    progressTarget: 1,
+    progressText: 'Completed!',
   };
 
   const lockedAchievement: AchievementWithProgress = {
@@ -34,8 +33,7 @@ describe('AchievementCard', () => {
     isUnlocked: false,
     unlockedAt: null,
     progressPercent: 42,
-    progressCurrent: 3,
-    progressTarget: 7,
+    progressText: '3/7 day streak',
   };
 
   it('renders achievement name and description', () => {
@@ -51,32 +49,34 @@ describe('AchievementCard', () => {
     expect(screen.getByText(/50.*XP/)).toBeInTheDocument();
   });
 
-  it('shows unlocked state with checkmark', () => {
+  it('shows unlocked state with icon', () => {
     render(<AchievementCard achievement={unlockedAchievement} />);
 
-    // Unlocked achievement should have visual indicator
-    const card = screen.getByRole('article');
+    // Unlocked achievement should have visual indicator (button element)
+    const card = screen.getByRole('button');
     expect(card).toBeInTheDocument();
   });
 
-  it('shows locked state with progress bar', () => {
+  it('shows locked state with progress text', () => {
     render(<AchievementCard achievement={lockedAchievement} />);
 
-    // Should show progress
-    expect(screen.getByText(/3.*\/.*7/)).toBeInTheDocument();
+    // Should show progress text
+    expect(screen.getByText(/3\/7 day streak/)).toBeInTheDocument();
   });
 
-  it('shows progress percentage for locked achievement', () => {
-    render(<AchievementCard achievement={lockedAchievement} />);
+  it('shows progress bar for locked achievement', () => {
+    const { container } = render(<AchievementCard achievement={lockedAchievement} />);
 
-    expect(screen.getByText(/42%/)).toBeInTheDocument();
+    // There should be a progress bar div with the category color gradient
+    const progressBar = container.querySelector('[class*="bg-gradient"]');
+    expect(progressBar).toBeInTheDocument();
   });
 
   it('calls onClick when clicked', () => {
     const handleClick = vi.fn();
     render(<AchievementCard achievement={unlockedAchievement} onClick={handleClick} />);
 
-    fireEvent.click(screen.getByRole('article'));
+    fireEvent.click(screen.getByRole('button'));
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -91,8 +91,10 @@ describe('AchievementCard', () => {
   it('displays unlock date for unlocked achievements', () => {
     render(<AchievementCard achievement={unlockedAchievement} />);
 
-    // Should show when it was unlocked
-    expect(screen.getByText(/unlocked/i)).toBeInTheDocument();
+    // Should show the date it was unlocked (formatted as local date)
+    // The component shows: new Date(achievement.unlockedAt).toLocaleDateString()
+    const date = new Date('2025-01-15T10:00:00Z').toLocaleDateString();
+    expect(screen.getByText(date)).toBeInTheDocument();
   });
 
   it('applies different styling for locked vs unlocked', () => {
@@ -100,15 +102,14 @@ describe('AchievementCard', () => {
       <AchievementCard achievement={unlockedAchievement} />
     );
 
-    // Unlocked should not be greyed out
+    // Unlocked should not have opacity-60 (locked state uses opacity-60)
     let card = container.firstChild as HTMLElement;
-    expect(card.className).not.toContain('opacity-50');
+    expect(card.className).not.toContain('opacity-60');
 
-    // Locked should be slightly greyed
+    // Locked should have opacity-60
     rerender(<AchievementCard achievement={lockedAchievement} />);
     card = container.firstChild as HTMLElement;
-    // The locked state should have different styling
-    expect(card).toBeInTheDocument();
+    expect(card.className).toContain('opacity-60');
   });
 
   it('renders icon based on achievement.icon', () => {

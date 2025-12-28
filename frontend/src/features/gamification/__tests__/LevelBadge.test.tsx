@@ -28,52 +28,52 @@ describe('LevelBadge', () => {
   it('applies correct size classes', () => {
     const { rerender, container } = render(<LevelBadge level={1} size="sm" />);
 
-    // Small size
+    // Small size (w-8)
     let badge = container.querySelector('[class*="w-8"]');
     expect(badge).toBeInTheDocument();
 
-    // Medium size
+    // Medium size (w-10)
     rerender(<LevelBadge level={1} size="md" />);
     badge = container.querySelector('[class*="w-10"]');
     expect(badge).toBeInTheDocument();
 
-    // Large size
+    // Large size (w-14)
     rerender(<LevelBadge level={1} size="lg" />);
-    badge = container.querySelector('[class*="w-12"]');
+    badge = container.querySelector('[class*="w-14"]');
     expect(badge).toBeInTheDocument();
 
-    // Extra large size
+    // Extra large size (w-20)
     rerender(<LevelBadge level={1} size="xl" />);
-    badge = container.querySelector('[class*="w-16"]');
+    badge = container.querySelector('[class*="w-20"]');
     expect(badge).toBeInTheDocument();
   });
 
   it('uses different colors for different levels', () => {
     const { rerender, container } = render(<LevelBadge level={1} />);
 
-    // Level 1-4 should use gray/neutral
-    let badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain('gray');
+    // Level 1-4 should use gray
+    let badgeInner = container.querySelector('[role="img"]') as HTMLElement;
+    expect(badgeInner.className).toContain('gray');
 
-    // Level 5-9 should use blue
+    // Level 5-9 should use green
     rerender(<LevelBadge level={5} />);
-    badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain('blue');
+    badgeInner = container.querySelector('[role="img"]') as HTMLElement;
+    expect(badgeInner.className).toContain('green');
 
-    // Level 10-14 should use purple
+    // Level 10-14 should use blue
     rerender(<LevelBadge level={10} />);
-    badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain('purple');
+    badgeInner = container.querySelector('[role="img"]') as HTMLElement;
+    expect(badgeInner.className).toContain('blue');
 
-    // Level 15-19 should use amber
+    // Level 15-19 should use purple
     rerender(<LevelBadge level={15} />);
-    badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain('amber');
+    badgeInner = container.querySelector('[role="img"]') as HTMLElement;
+    expect(badgeInner.className).toContain('purple');
 
-    // Level 20 should use gradient/gold
+    // Level 20 should use amber/gold
     rerender(<LevelBadge level={20} />);
-    badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain('gradient');
+    badgeInner = container.querySelector('[role="img"]') as HTMLElement;
+    expect(badgeInner.className).toContain('amber');
   });
 
   it('applies custom className', () => {

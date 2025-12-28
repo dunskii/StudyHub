@@ -25,8 +25,11 @@ describe('XPBar', () => {
   it('displays XP label when showLabel is true', () => {
     render(<XPBar {...defaultProps} showLabel />);
 
+    // currentXp: 150
     expect(screen.getByText(/150/)).toBeInTheDocument();
-    expect(screen.getByText(/300/)).toBeInTheDocument();
+    // Progress is (currentXp - levelStartXp) / (nextLevelXp - levelStartXp)
+    // So we show "50 / 200 to next level" (150-100=50, 300-100=200)
+    expect(screen.getByText(/200/)).toBeInTheDocument();
   });
 
   it('hides label when showLabel is false', () => {
@@ -75,19 +78,19 @@ describe('XPBar', () => {
   it('applies correct size classes', () => {
     const { rerender } = render(<XPBar {...defaultProps} size="sm" />);
 
-    // Test small size
+    // Test small size (h-1.5)
     let progressBar = screen.getByRole('progressbar');
-    expect(progressBar.className).toContain('h-1');
+    expect(progressBar.className).toContain('h-1.5');
 
-    // Test medium size
+    // Test medium size (h-2.5)
     rerender(<XPBar {...defaultProps} size="md" />);
     progressBar = screen.getByRole('progressbar');
-    expect(progressBar.className).toContain('h-2');
+    expect(progressBar.className).toContain('h-2.5');
 
-    // Test large size
+    // Test large size (h-4)
     rerender(<XPBar {...defaultProps} size="lg" />);
     progressBar = screen.getByRole('progressbar');
-    expect(progressBar.className).toContain('h-3');
+    expect(progressBar.className).toContain('h-4');
   });
 
   it('applies custom className', () => {

@@ -279,6 +279,13 @@ auth_rate_limiter = AuthRateLimiter(
     lockout_seconds=300, # 5 minute lockout
 )
 
+# Push notification rate limiter (less strict than auth)
+push_rate_limiter = AuthRateLimiter(
+    max_attempts=10,     # 10 subscription operations per minute
+    window_seconds=60,   # per minute
+    lockout_seconds=300, # 5 minute lockout if exceeded
+)
+
 
 async def require_auth_rate_limit(request: Request) -> None:
     """Dependency to check auth rate limiting.
@@ -296,3 +303,20 @@ async def require_auth_rate_limit(request: Request) -> None:
             # On success: auth_rate_limiter.clear_attempts(request)
     """
     auth_rate_limiter.check_rate_limit(request)
+
+
+async def require_push_rate_limit(request: Request) -> None:
+    """Dependency to check push notification rate limiting.
+
+    Use this on push subscription endpoints to prevent spam.
+
+    Example:
+        @router.post("/subscribe")
+        async def subscribe(
+            request: Request,
+            _: None = Depends(require_push_rate_limit),
+            ...
+        ):
+            push_rate_limiter.record_attempt(request)
+    """
+    push_rate_limiter.check_rate_limit(request)

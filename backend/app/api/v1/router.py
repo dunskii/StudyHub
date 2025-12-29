@@ -7,6 +7,7 @@ from app.api.v1.endpoints import (
     gamification,
     notes,
     parent_dashboard,
+    push,
     revision,
     senior_courses,
     sessions,
@@ -89,4 +90,10 @@ api_router.include_router(
 api_router.include_router(
     gamification.router,
     tags=["gamification"],
+)
+
+# Push notification endpoints (Phase 9: PWA)
+api_router.include_router(
+    push.router,
+    tags=["push-notifications"],
 )

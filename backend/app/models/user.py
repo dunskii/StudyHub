@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from app.models.goal import Goal
     from app.models.notification import Notification
     from app.models.notification_preference import NotificationPreference
+    from app.models.push_subscription import PushSubscription
     from app.models.student import Student
 
 
@@ -78,4 +79,7 @@ class User(Base):
     )
     notification_preferences: Mapped[NotificationPreference | None] = relationship(
         "NotificationPreference", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    push_subscriptions: Mapped[list[PushSubscription]] = relationship(
+        "PushSubscription", back_populates="user", cascade="all, delete-orphan"
     )

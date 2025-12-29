@@ -1,7 +1,7 @@
 # StudyHub Development Progress
 
 **Last Updated**: 2025-12-29
-**Overall Progress**: 90% (Phase 8 Gamification Complete)
+**Overall Progress**: 95% (Phase 9 PWA & Offline Complete)
 
 ---
 
@@ -18,7 +18,7 @@
 | 6 | Revision & Spaced Repetition | ✅ **COMPLETE** | 100% |
 | 7 | Parent Dashboard | ✅ **COMPLETE** | 100% |
 | 8 | Gamification & Engagement | ✅ **COMPLETE** | 100% |
-| 9 | PWA & Offline | NOT STARTED | 0% |
+| 9 | PWA & Offline | ✅ **COMPLETE** | 100% |
 | 10 | Testing & Launch | NOT STARTED | 0% |
 
 ---
@@ -513,27 +513,69 @@ Test Results:
 
 ---
 
-## Phase 9: HSC/Senior Features
+## Phase 9: PWA & Offline ✅ COMPLETE (2025-12-29)
 
-- [ ] HSC course selection
-- [ ] Band prediction (stretch)
-- [ ] Exam preparation mode
-- [ ] Study planning tools
-- [ ] ATAR tracking (stretch)
+### PWA Foundation ✅
+- [x] Vite PWA Plugin configuration with injectManifest strategy
+- [x] Custom service worker (src/sw.ts) with Workbox
+- [x] PWA manifest with proper icons and metadata
+- [x] 6 SVG icon assets (favicon, apple-touch, pwa icons, maskable)
+- [x] HTML meta tags for iOS/Android/Windows
+- [x] Runtime caching for curriculum data (30-day TTL)
+- [x] Network-first API caching with 24-hour TTL
+
+### IndexedDB Offline Storage ✅
+- [x] Database module with 6 stores (frameworks, subjects, outcomes, flashcards, pendingSync, metadata)
+- [x] Curriculum sync service with paginated fetching
+- [x] Sync queue for offline operations with retry logic
+- [x] Framework-filtered caching (framework_id keyed)
+- [x] Cache metadata with timestamps
+
+### Offline UI Components ✅
+- [x] OfflineIndicator with syncing state
+- [x] OfflineStatusBadge for navigation
+- [x] OfflineFallback for critical features
+- [x] SyncStatus with pending count
+- [x] SyncIndicator compact version
+
+### Hooks ✅
+- [x] useOnlineStatus with custom events
+- [x] useConnectivityEvents for sync triggers
+- [x] useOfflineSubjects, useOfflineOutcomes, useOfflineFrameworks
+- [x] useCurriculumSync for auto-sync
+- [x] useOfflineAvailability check
+
+### Push Notifications ✅
+- [x] PushSubscription model and migration
+- [x] PushService for subscription management
+- [x] Push API endpoints (subscribe, unsubscribe, list, test)
+- [x] NotificationPrompt component with permission flow
+- [x] Service worker push event handling
+- [x] Notification click navigation
+
+### Test Coverage ✅
+- [x] 34 offline tests (database, syncQueue, useOnlineStatus, OfflineIndicator)
+- [x] TypeScript strict mode compliance
+- [x] All PWA-related code compiles
+
+### Files Created
+**Frontend (17 files)**:
+- `public/` - 6 SVG icon assets
+- `src/sw.ts` - Custom service worker
+- `src/lib/offline/` - 5 files (database, curriculumSync, syncQueue, index, tests)
+- `src/hooks/useOnlineStatus.ts`, `useOfflineData.ts`
+- `src/components/ui/OfflineIndicator.tsx`, `SyncStatus.tsx`, `NotificationPrompt.tsx`
+
+**Backend (5 files)**:
+- `models/push_subscription.py`
+- `schemas/push.py`
+- `services/push_service.py`
+- `api/v1/endpoints/push.py`
+- `alembic/versions/021_push_subscriptions.py`
 
 ---
 
-## Phase 10: PWA & Offline
-
-- [ ] Service worker configuration
-- [ ] IndexedDB for offline data
-- [ ] Background sync
-- [ ] Download for offline
-- [ ] Push notifications
-
----
-
-## Phase 11: Testing & Launch
+## Phase 10: Testing & Launch
 
 - [ ] Unit test coverage > 80%
 - [ ] E2E tests for critical paths
@@ -546,6 +588,44 @@ Test Results:
 ---
 
 ## Changelog
+
+### 2025-12-29 - Phase 9 Complete with QA Hardening
+- **Phase 9 PWA & Offline: 100% COMPLETE**
+- PWA Foundation:
+  - Vite PWA Plugin with injectManifest strategy
+  - Custom service worker (sw.ts) with Workbox caching strategies
+  - 6 SVG icons (72, 96, 128, 144, 192, 512px) plus maskable variants
+  - Runtime caching: curriculum (30-day), API (24-hour), images (7-day)
+- Offline Support:
+  - IndexedDB with 6 object stores (frameworks, subjects, outcomes, flashcards, pendingSync, metadata)
+  - Curriculum sync with framework filtering and paginated fetching
+  - Background sync queue with retry logic (5 max retries)
+  - Offline UI components (OfflineIndicator, OfflineStatusBadge, OfflineFallback, SyncStatus)
+- Push Notifications:
+  - PushSubscription model and migration (021_push_subscriptions.py)
+  - PushService for subscription management
+  - 4 API endpoints (subscribe, unsubscribe, list, test)
+  - NotificationPrompt component for permission requests
+  - Service worker push handlers
+- QA Priority 1 Fixes:
+  - Rate limiting on push endpoints (10/min, 5-min lockout)
+  - 36 backend tests (18 unit + 18 integration)
+  - URL validation (HTTPS required, 2048 char limit)
+  - datetime.utcnow() deprecation fix
+- QA Priority 2 Fixes:
+  - SyncStatus component tests (16 tests)
+  - NotificationPrompt component tests (24 tests)
+  - TypeScript typing in sw.ts (PushSubscriptionChangeEvent interface)
+  - Removed unused import in OfflineIndicator tests
+- Test Results:
+  - Backend push tests: 36 tests passing
+  - Frontend Phase 9 tests: 74 tests passing
+  - Total frontend tests: 523 passing
+- Files created:
+  - Backend: 7 files (model, schema, service, endpoints, migration, 2 test files)
+  - Frontend: 17 files (icons, sw.ts, offline lib, hooks, components, tests)
+- QA review: PASS - `md/review/phase-9-priority-fixes-review.md`
+- Work report: `md/report/phase-9-complete.md`
 
 ### 2025-12-29 - Phase 8 Test Infrastructure Fixes Complete
 - **Phase 8 Test Infrastructure: 100% COMPLETE**

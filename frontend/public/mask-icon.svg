@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Safari pinned tab icon - must be single color, no gradients -->
+  <g fill="black">
+    <!-- Open book -->
+    <path d="M5 7c0-1.5 1.2-2.5 2.5-2.5H15v19H7.5C6 23.5 5 22.5 5 21V7z"/>
+    <path d="M17 4.5h7.5C26 4.5 27 5.5 27 7v14c0 1.5-1 2.5-2.5 2.5H17v-19z" opacity="0.8"/>
+    <!-- Graduation cap -->
+    <polygon points="16,1 26,5 16,8 6,5"/>
+  </g>
+</svg>

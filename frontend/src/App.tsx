@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom'
 import { TutorPage } from '@/pages/TutorPage'
 import { NotesPage } from '@/pages/NotesPage'
 import RevisionPage from '@/pages/RevisionPage'
+import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage'
+import { TermsOfServicePage } from '@/pages/TermsOfServicePage'
 import { AuthGuard } from '@/features/auth/AuthGuard'
 
 function App() {
@@ -29,6 +31,8 @@ function App() {
         } />
         <Route path="/parent" element={<div>Parent Dashboard</div>} />
         <Route path="/select-student" element={<div>Select Student</div>} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsOfServicePage />} />
       </Routes>
     </div>
   )

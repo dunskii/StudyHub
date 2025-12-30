@@ -10,7 +10,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.database import Base, get_db
-from app.core.security import create_access_token
+from app.core.security import create_access_token, auth_rate_limiter, push_rate_limiter
 from app.main import app
 from app.models import *  # noqa: F401, F403
 
@@ -39,6 +39,21 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiters():
+    """Reset rate limiters before each test to prevent cross-test interference."""
+    auth_rate_limiter._attempts.clear()
+    auth_rate_limiter._lockouts.clear()
+    push_rate_limiter._attempts.clear()
+    push_rate_limiter._lockouts.clear()
+    yield
+    # Also clear after test
+    auth_rate_limiter._attempts.clear()
+    auth_rate_limiter._lockouts.clear()
+    push_rate_limiter._attempts.clear()
+    push_rate_limiter._lockouts.clear()
 
 
 @pytest_asyncio.fixture(scope="function")

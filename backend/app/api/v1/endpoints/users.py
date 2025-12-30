@@ -1,10 +1,12 @@
 """User endpoints for parent account management."""
+import secrets
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.exceptions import AlreadyExistsError, NotFoundError
 from app.core.security import (
@@ -19,10 +21,19 @@ from app.schemas.ai_interaction import (
     AIInteractionResponse,
     TokenUsageResponse,
 )
+from app.schemas.deletion import (
+    DeletionCancelledResponse,
+    DeletionConfirmedResponse,
+    DeletionConfirmRequest,
+    DeletionInitiatedResponse,
+    DeletionRequestCreate,
+    DeletionStatusResponse,
+)
 from app.services.data_export_service import DataExportService
 from app.services.student_service import StudentService
 from app.services.user_service import UserService
 from app.services.ai_interaction_service import AIInteractionService
+from app.services.account_deletion_service import AccountDeletionService
 from app.models.student import Student
 
 router = APIRouter()
@@ -436,3 +447,239 @@ async def get_child_ai_usage(
         estimated_cost_usd=cost,
         period=period,
     )
+
+
+# =============================================================================
+# Account Deletion Endpoints
+# =============================================================================
+
+
+@router.post("/me/request-deletion", response_model=DeletionInitiatedResponse)
+async def request_account_deletion(
+    request: Request,
+    data: DeletionRequestCreate,
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> DeletionInitiatedResponse:
+    """Request account deletion with 7-day grace period.
+
+    Initiates the account deletion process. A confirmation email will be sent,
+    and the account will be scheduled for deletion after a 7-day grace period.
+
+    The user can cancel the deletion at any time before execution.
+
+    Args:
+        request: The FastAPI request object (for IP logging).
+        data: Deletion request details (optional reason, export request).
+        current_user: The authenticated user.
+        db: Database session.
+
+    Returns:
+        Confirmation of the deletion request initiation.
+
+    Raises:
+        HTTPException: 409 if a deletion request already exists.
+    """
+    # Get client IP for audit trail
+    ip_address = request.client.host if request.client else None
+
+    service = AccountDeletionService(db)
+
+    try:
+        deletion_request = await service.request_deletion(
+            user_id=current_user.id,
+            request_data=data,
+            ip_address=ip_address,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        )
+
+    return DeletionInitiatedResponse(
+        message=(
+            "Account deletion request initiated. "
+            "Please check your email to confirm the deletion."
+        ),
+        deletion_request_id=deletion_request.id,
+        scheduled_deletion_at=deletion_request.scheduled_deletion_at,
+        confirmation_email_sent=True,  # TODO: Actually send email
+        grace_period_days=7,
+    )
+
+
+@router.post("/me/confirm-deletion", response_model=DeletionConfirmedResponse)
+async def confirm_account_deletion(
+    data: DeletionConfirmRequest,
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> DeletionConfirmedResponse:
+    """Confirm account deletion with password and token.
+
+    After confirmation, the account will be permanently deleted on the scheduled date.
+    The user can still cancel before the scheduled deletion date.
+
+    Args:
+        data: Confirmation data including password and token from email.
+        current_user: The authenticated user.
+        db: Database session.
+
+    Returns:
+        Confirmation that the deletion has been scheduled.
+
+    Raises:
+        HTTPException: 400 if token is invalid or request not found.
+        HTTPException: 401 if password verification fails.
+    """
+    # TODO: Verify password with Supabase
+    # For now, we trust the confirmation token
+
+    service = AccountDeletionService(db)
+
+    try:
+        deletion_request = await service.confirm_deletion(
+            user_id=current_user.id,
+            confirmation_token=data.confirmation_token,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+    return DeletionConfirmedResponse(
+        message=(
+            "Account deletion confirmed. Your account and all data will be "
+            f"permanently deleted on {deletion_request.scheduled_deletion_at.strftime('%B %d, %Y')}. "
+            "You can cancel this at any time before the scheduled date."
+        ),
+        deletion_request_id=deletion_request.id,
+        scheduled_deletion_at=deletion_request.scheduled_deletion_at,
+        status=deletion_request.status,
+    )
+
+
+@router.delete("/me/cancel-deletion", response_model=DeletionCancelledResponse)
+async def cancel_account_deletion(
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> DeletionCancelledResponse:
+    """Cancel a pending or confirmed account deletion request.
+
+    This can be called at any time before the scheduled deletion date to
+    stop the deletion process.
+
+    Args:
+        current_user: The authenticated user.
+        db: Database session.
+
+    Returns:
+        Confirmation that the deletion has been cancelled.
+
+    Raises:
+        HTTPException: 404 if no active deletion request exists.
+        HTTPException: 409 if deletion has already been executed.
+    """
+    service = AccountDeletionService(db)
+
+    try:
+        deletion_request = await service.cancel_deletion(current_user.id)
+    except ValueError as e:
+        error_msg = str(e)
+        if "already executed" in error_msg.lower():
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=error_msg,
+            )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=error_msg,
+        )
+
+    return DeletionCancelledResponse(
+        message="Account deletion has been cancelled. Your account is safe.",
+        deletion_request_id=deletion_request.id,
+        cancelled_at=deletion_request.cancelled_at,  # type: ignore
+    )
+
+
+@router.get("/me/deletion-status", response_model=DeletionStatusResponse)
+async def get_deletion_status(
+    current_user: AuthenticatedUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> DeletionStatusResponse:
+    """Get the current status of any active account deletion request.
+
+    Returns whether the user has an active deletion request and its details.
+
+    Args:
+        current_user: The authenticated user.
+        db: Database session.
+
+    Returns:
+        The deletion status and request details if one exists.
+    """
+    service = AccountDeletionService(db)
+    deletion_response = await service.get_deletion_status(current_user.id)
+
+    return DeletionStatusResponse(
+        has_pending_deletion=deletion_response is not None,
+        deletion_request=deletion_response,
+    )
+
+
+# =============================================================================
+# Admin/Scheduled Task Endpoints
+# =============================================================================
+
+
+@router.post("/admin/scheduled-tasks/deletion-reminders")
+async def trigger_deletion_reminders(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    x_admin_key: Annotated[str, Header()],
+) -> dict[str, int]:
+    """Trigger deletion reminder emails for accounts due for deletion in ~1 day.
+
+    This endpoint is intended to be called by an external cron job (e.g., GitHub Actions).
+    It finds all confirmed deletion requests scheduled for approximately 1 day from now
+    that haven't had a reminder sent yet, and sends reminder emails.
+
+    Args:
+        db: Database session.
+        x_admin_key: Admin API key for authentication (X-Admin-Key header).
+
+    Returns:
+        Count of reminders sent.
+
+    Raises:
+        HTTPException 403: Invalid admin API key.
+    """
+    settings = get_settings()
+
+    # Validate admin API key
+    if not settings.admin_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Admin API key not configured",
+        )
+
+    # Use constant-time comparison to prevent timing attacks
+    if not secrets.compare_digest(x_admin_key, settings.admin_api_key):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid admin API key",
+        )
+
+    service = AccountDeletionService(db)
+
+    # Find requests needing reminders
+    requests_needing_reminder = await service.get_requests_needing_reminder()
+
+    # Send reminders
+    sent_count = 0
+    for deletion_request in requests_needing_reminder:
+        if await service.send_deletion_reminder(deletion_request):
+            sent_count += 1
+
+    return {"reminders_sent": sent_count, "total_found": len(requests_needing_reminder)}

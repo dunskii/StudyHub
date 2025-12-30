@@ -280,7 +280,7 @@ function FlashcardCreatorComponent({
               Cancel
             </Button>
           )}
-          <Button type="submit" variant="primary" disabled={isSubmitting}>
+          <Button type="submit" variant="default" disabled={isSubmitting}>
             {isSubmitting ? 'Creating...' : 'Create Flashcard'}
           </Button>
         </div>

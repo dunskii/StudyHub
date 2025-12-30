@@ -9,6 +9,8 @@ from app.services.student_subject_service import (
 )
 from app.services.subject_service import SubjectService
 from app.services.user_service import UserService
+from app.services.account_deletion_service import AccountDeletionService
+from app.services.ai_usage_service import AIUsageService
 
 __all__ = [
     "CurriculumService",
@@ -19,4 +21,6 @@ __all__ = [
     "StudentSubjectService",
     "SubjectService",
     "UserService",
+    "AccountDeletionService",
+    "AIUsageService",
 ]

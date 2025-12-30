@@ -2,7 +2,7 @@
  * React Query hooks for note management.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import {
   notesApi,
   type NoteCreateRequest,
@@ -117,7 +117,7 @@ export function useUploadNote() {
         setUploading(false)
       }
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate note list queries
       queryClient.invalidateQueries({ queryKey: noteKeys.lists() })
       clearUploadState()
@@ -144,7 +144,7 @@ export function useUpdateNote() {
       studentId: string
       request: NoteUpdateRequest
     }) => notesApi.updateNote(noteId, studentId, request),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: noteKeys.detail(variables.noteId) })
       queryClient.invalidateQueries({ queryKey: noteKeys.lists() })
     },

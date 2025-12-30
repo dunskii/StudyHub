@@ -20,10 +20,13 @@ import {
   Target,
   Lightbulb,
   FileText,
+  Trash2,
 } from 'lucide-react';
 import { parentDashboardApi } from '@/lib/api';
 import type { NotificationPreferences, UpdateNotificationPreferencesRequest } from '@/lib/api';
-import { Card, Spinner } from '@/components/ui';
+import { Button, Card, Spinner } from '@/components/ui';
+import { DeleteAccountModal } from '@/features/auth/components/DeleteAccountModal';
+import { DeletionPending } from '@/features/auth/components/DeletionPending';
 
 const TIMEZONES = [
   'Australia/Sydney',
@@ -137,6 +140,9 @@ export function SettingsTab() {
         onUpdate={(data) => updatePreferences.mutate(data)}
         isUpdating={updatePreferences.isPending}
       />
+
+      {/* Danger Zone */}
+      <DangerZoneSection />
     </div>
   );
 }
@@ -475,5 +481,47 @@ function QuietHoursSection({ preferences, onUpdate, isUpdating }: SectionProps) 
         )}
       </div>
     </Card>
+  );
+}
+
+function DangerZoneSection() {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  return (
+    <>
+      <Card className="border-red-200 p-6">
+        <div className="mb-4 flex items-center gap-2">
+          <Trash2 className="h-5 w-5 text-red-500" />
+          <h3 className="text-lg font-medium text-red-700">Danger Zone</h3>
+        </div>
+
+        {/* Show pending deletion banner if applicable */}
+        <DeletionPending variant="card" />
+
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-medium text-red-800">Delete Account</p>
+              <p className="mt-1 text-sm text-red-600">
+                Permanently delete your account and all associated data, including all student profiles.
+              </p>
+            </div>
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteModal(true)}
+              className="shrink-0"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Account
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      <DeleteAccountModal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+      />
+    </>
   );
 }

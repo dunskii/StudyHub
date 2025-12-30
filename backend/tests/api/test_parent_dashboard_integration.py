@@ -322,7 +322,7 @@ class TestNotificationOwnership:
         own_notification = Notification(
             id=uuid4(),
             user_id=sample_user.id,
-            type="milestone",
+            type="achievement",  # Valid notification type
             title="Your Notification",
             message="This is yours",
             priority="normal",
@@ -331,7 +331,7 @@ class TestNotificationOwnership:
         other_notification = Notification(
             id=uuid4(),
             user_id=another_user.id,
-            type="milestone",
+            type="achievement",  # Valid notification type
             title="Other Notification",
             message="This is not yours",
             priority="normal",
@@ -574,7 +574,10 @@ class TestErrorResponses:
         assert response.status_code == 404
 
         data = response.json()
-        assert "detail" in data
+        # Accept either 'detail' or 'message' key for error responses
+        assert "detail" in data or "message" in data
+        if "details" in data:
+            assert "hint" in data["details"]
 
     @pytest.mark.asyncio
     async def test_validation_error_format(

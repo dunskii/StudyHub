@@ -76,8 +76,12 @@ class TestGetStudentSummary:
         self, analytics_service, mock_db, sample_student
     ):
         """Test getting a student summary."""
-        # Mock db.get to return student
-        mock_db.get.return_value = sample_student
+        parent_id = sample_student.parent_id
+
+        # Mock db.execute to return student (verifies ownership)
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = sample_student
+        mock_db.execute.return_value = mock_result
 
         # Mock session counting methods
         with patch.object(
@@ -88,7 +92,9 @@ class TestGetStudentSummary:
             mock_count.return_value = 5
             mock_time.return_value = 120
 
-            result = await analytics_service.get_student_summary(sample_student.id)
+            result = await analytics_service.get_student_summary(
+                sample_student.id, parent_id
+            )
 
             assert result is not None
             assert result.id == sample_student.id
@@ -103,9 +109,13 @@ class TestGetStudentSummary:
     @pytest.mark.asyncio
     async def test_get_student_summary_not_found(self, analytics_service, mock_db):
         """Test getting summary for non-existent student."""
-        mock_db.get.return_value = None
+        parent_id = uuid4()
 
-        result = await analytics_service.get_student_summary(uuid4())
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = None
+        mock_db.execute.return_value = mock_result
+
+        result = await analytics_service.get_student_summary(uuid4(), parent_id)
 
         assert result is None
 
@@ -114,8 +124,12 @@ class TestGetStudentSummary:
         self, analytics_service, mock_db, sample_student
     ):
         """Test summary when student has no gamification data."""
+        parent_id = sample_student.parent_id
         sample_student.gamification = None
-        mock_db.get.return_value = sample_student
+
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = sample_student
+        mock_db.execute.return_value = mock_result
 
         with patch.object(
             analytics_service, '_count_sessions_since', new_callable=AsyncMock
@@ -125,7 +139,9 @@ class TestGetStudentSummary:
             mock_count.return_value = 0
             mock_time.return_value = 0
 
-            result = await analytics_service.get_student_summary(sample_student.id)
+            result = await analytics_service.get_student_summary(
+                sample_student.id, parent_id
+            )
 
             assert result is not None
             assert result.total_xp == 0
@@ -138,32 +154,49 @@ class TestGetStudentsSummary:
 
     @pytest.mark.asyncio
     async def test_get_students_summary_multiple(
-        self, analytics_service, mock_db, sample_student
+        self, analytics_service, mock_db
     ):
         """Test getting summaries for multiple students."""
         parent_id = uuid4()
+
+        # Create properly typed mock students
+        student1 = MagicMock()
+        student1.id = uuid4()
+        student1.display_name = "First Student"
+        student1.grade_level = 5
+        student1.school_stage = "S3"
+        student1.framework_id = uuid4()
+        student1.last_active_at = datetime.now(timezone.utc)
+        student1.gamification = {"totalXP": 500, "level": 3, "streaks": {"current": 2, "longest": 5}}
+
         student2 = MagicMock()
         student2.id = uuid4()
         student2.display_name = "Second Student"
+        student2.grade_level = 7
+        student2.school_stage = "S4"
+        student2.framework_id = uuid4()
+        student2.last_active_at = datetime.now(timezone.utc)
+        student2.gamification = {"totalXP": 1000, "level": 5, "streaks": {"current": 10, "longest": 10}}
 
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = [sample_student, student2]
-        mock_db.execute.return_value = mock_result
+        # Mock the students query
+        students_result = MagicMock()
+        students_result.scalars.return_value.all.return_value = [student1, student2]
 
-        with patch.object(
-            analytics_service, 'get_student_summary', new_callable=AsyncMock
-        ) as mock_get:
-            summary1 = MagicMock()
-            summary1.id = sample_student.id
-            summary2 = MagicMock()
-            summary2.id = student2.id
-            mock_get.side_effect = [summary1, summary2]
+        # Mock the sessions query (returns counts)
+        sessions_result = MagicMock()
+        sessions_result.all.return_value = [(student1.id, 3), (student2.id, 5)]
 
-            result = await analytics_service.get_students_summary(parent_id)
+        # Mock the time query
+        time_result = MagicMock()
+        time_result.all.return_value = [(student1.id, 60), (student2.id, 120)]
 
-            assert len(result) == 2
-            mock_get.assert_any_call(sample_student.id)
-            mock_get.assert_any_call(student2.id)
+        mock_db.execute.side_effect = [students_result, sessions_result, time_result]
+
+        result = await analytics_service.get_students_summary(parent_id)
+
+        assert len(result) == 2
+        assert result[0].display_name == "First Student"
+        assert result[1].display_name == "Second Student"
 
     @pytest.mark.asyncio
     async def test_get_students_summary_empty(self, analytics_service, mock_db):

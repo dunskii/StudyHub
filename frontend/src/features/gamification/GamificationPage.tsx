@@ -39,7 +39,7 @@ export function GamificationPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Spinner size="lg" label="Loading gamification data..." />
+        <Spinner size="lg" aria-label="Loading gamification data..." />
       </div>
     );
   }

@@ -17,6 +17,8 @@ from app.models.notification_preference import NotificationPreference, EmailFreq
 from app.models.weekly_insight import WeeklyInsight
 from app.models.achievement_definition import AchievementDefinition
 from app.models.push_subscription import PushSubscription
+from app.models.deletion_request import DeletionRequest, DeletionStatus
+from app.models.ai_usage import AIUsage
 
 __all__ = [
     "CurriculumFramework",
@@ -45,4 +47,9 @@ __all__ = [
     "AchievementDefinition",
     # Phase 9: PWA
     "PushSubscription",
+    # Phase 10: Account Deletion
+    "DeletionRequest",
+    "DeletionStatus",
+    # Phase 10: AI Usage Limits
+    "AIUsage",
 ]

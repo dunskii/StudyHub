@@ -12,6 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
 if TYPE_CHECKING:
+    from app.models.ai_usage import AIUsage
     from app.models.curriculum_framework import CurriculumFramework
     from app.models.flashcard import Flashcard
     from app.models.goal import Goal
@@ -107,4 +108,7 @@ class Student(Base):
     )
     weekly_insights: Mapped[list[WeeklyInsight]] = relationship(
         "WeeklyInsight", back_populates="student", cascade="all, delete-orphan"
+    )
+    ai_usage_records: Mapped[list[AIUsage]] = relationship(
+        "AIUsage", back_populates="student", cascade="all, delete-orphan"
     )

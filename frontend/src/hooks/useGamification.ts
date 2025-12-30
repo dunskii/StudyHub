@@ -2,18 +2,9 @@
  * React Query hooks for gamification data fetching.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   gamificationApi,
-  type GamificationStats,
-  type GamificationStatsDetailed,
-  type LevelInfo,
-  type StreakInfo,
-  type AchievementWithProgress,
-  type Achievement,
-  type AchievementDefinition,
-  type SubjectLevelInfo,
-  type ParentGamificationSummary,
   type AchievementCategory,
 } from '@/lib/api/gamification';
 import { useGamificationStore } from '@/stores/gamificationStore';

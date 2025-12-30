@@ -6,3 +6,5 @@ export { AuthProvider, useAuth } from './AuthProvider';
 export { AuthGuard, GuestGuard } from './AuthGuard';
 export { LoginForm } from './LoginForm';
 export { SignupForm } from './SignupForm';
+export { DeleteAccountModal } from './components/DeleteAccountModal';
+export { DeletionPending, useDeletionStatus } from './components/DeletionPending';

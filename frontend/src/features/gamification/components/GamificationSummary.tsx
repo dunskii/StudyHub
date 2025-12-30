@@ -29,7 +29,7 @@ export const GamificationSummary = memo(function GamificationSummary({
     return (
       <Card className={`p-4 ${className}`}>
         <div className="flex items-center justify-center py-4">
-          <Spinner size="sm" label="Loading progress..." />
+          <Spinner size="sm" aria-label="Loading progress..." />
         </div>
       </Card>
     );
@@ -168,7 +168,7 @@ export const GamificationSummary = memo(function GamificationSummary({
           <div className="space-y-2">
             {stats.subjectStats.slice(0, 3).map((subject) => (
               <div key={subject.subjectId} className="flex items-center gap-2">
-                <LevelBadge level={subject.level} size="xs" />
+                <LevelBadge level={subject.level} size="sm" />
                 <span className="text-sm text-gray-700 flex-1 truncate">
                   {subject.subjectName}
                 </span>

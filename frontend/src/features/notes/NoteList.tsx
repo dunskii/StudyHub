@@ -2,7 +2,7 @@
  * Note list component displaying a grid of notes.
  */
 import { memo } from 'react'
-import { FileText, Search, RefreshCw } from 'lucide-react'
+import { FileText, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { NoteCard } from './NoteCard'
@@ -51,23 +51,6 @@ function EmptyState() {
       <p className="max-w-sm text-sm text-gray-500">
         Upload your first note to get started. Take photos of handwritten notes,
         textbook pages, or any study materials.
-      </p>
-    </div>
-  )
-}
-
-/**
- * Empty state for search results.
- */
-function NoResultsState({ query }: { query?: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <Search className="mb-4 h-12 w-12 text-gray-300" />
-      <h3 className="mb-2 text-lg font-medium text-gray-900">No notes found</h3>
-      <p className="max-w-sm text-sm text-gray-500">
-        {query
-          ? `No notes match "${query}". Try a different search term.`
-          : 'No notes match your current filters.'}
       </p>
     </div>
   )

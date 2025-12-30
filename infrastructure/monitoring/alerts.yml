@@ -1,0 +1,113 @@
+# StudyHub Alert Rules
+# Configure these in your monitoring system (Prometheus AlertManager, Datadog, etc.)
+
+groups:
+  - name: studyhub_availability
+    rules:
+      # Health check failures
+      - alert: StudyHubDown
+        expr: probe_success{job="studyhub-health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "StudyHub is down"
+          description: "StudyHub health check has been failing for more than 2 minutes."
+
+      # High response latency
+      - alert: HighResponseLatency
+        expr: http_request_duration_seconds{quantile="0.99"} > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API response latency"
+          description: "99th percentile response time is above 2 seconds."
+
+  - name: studyhub_errors
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 5% for the last 5 minutes."
+
+      # Authentication failures spike
+      - alert: AuthFailuresSpike
+        expr: rate(auth_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+          description: "More than 10 auth failures per minute detected. Possible brute force attack."
+
+  - name: studyhub_ai
+    rules:
+      # AI cost threshold
+      - alert: AIHighCost
+        expr: sum(rate(ai_cost_usd_total[1h])) * 3600 > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High AI API costs"
+          description: "AI API costs exceeding $10/hour. Review usage patterns."
+
+      # AI error rate
+      - alert: AIErrorRate
+        expr: rate(ai_requests_failed_total[5m]) / rate(ai_requests_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High AI request failure rate"
+          description: "More than 10% of AI requests are failing."
+
+  - name: studyhub_database
+    rules:
+      # Database connection pool exhaustion
+      - alert: DBConnectionPoolHigh
+        expr: db_pool_size / db_pool_max > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool running low"
+          description: "Connection pool usage is above 80%."
+
+      # Slow queries
+      - alert: SlowQueries
+        expr: rate(db_slow_queries_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "More than 1 slow query per minute detected."
+
+  - name: studyhub_business
+    rules:
+      # No activity (during business hours)
+      - alert: NoUserActivity
+        expr: rate(studyhub_sessions_today[1h]) == 0 and hour() >= 8 and hour() <= 20
+        for: 30m
+        labels:
+          severity: info
+        annotations:
+          summary: "No user activity detected"
+          description: "No new sessions in the last 30 minutes during business hours."
+
+      # Student data access anomaly
+      - alert: UnusualDataAccess
+        expr: rate(data_exports_total[1h]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Unusual data export activity"
+          description: "High volume of data exports detected. Review for potential data exfiltration."

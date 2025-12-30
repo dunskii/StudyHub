@@ -33,7 +33,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
  * NoteUpload provides file selection and upload functionality.
  */
 export function NoteUpload({
-  studentId,
+  studentId: _studentId,
   subjectId,
   uploadProgress = 0,
   isUploading = false,

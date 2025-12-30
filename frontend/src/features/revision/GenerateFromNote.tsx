@@ -152,7 +152,7 @@ function GenerateFromNoteComponent({
             </Button>
           )}
           <Button
-            variant="primary"
+            variant="default"
             onClick={handleGenerate}
             disabled={isGenerating}
             className="flex items-center gap-2"
@@ -288,7 +288,7 @@ function GenerateFromNoteComponent({
             </Button>
           )}
           <Button
-            variant="primary"
+            variant="default"
             onClick={handleApprove}
             disabled={selectedDrafts.size === 0 || isApproving}
           >

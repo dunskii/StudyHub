@@ -8,4 +8,5 @@ export * from './Modal';
 export * from './SkipLink';
 export * from './Spinner';
 export * from './Toast';
+export * from './UsageBar';
 export * from './VisuallyHidden';

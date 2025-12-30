@@ -5,6 +5,7 @@ from app.api.v1.endpoints import (
     curriculum,
     frameworks,
     gamification,
+    metrics,
     notes,
     parent_dashboard,
     push,
@@ -96,4 +97,11 @@ api_router.include_router(
 api_router.include_router(
     push.router,
     tags=["push-notifications"],
+)
+
+# Metrics and monitoring endpoints (Phase 10: Production)
+api_router.include_router(
+    metrics.router,
+    prefix="/metrics",
+    tags=["monitoring"],
 )

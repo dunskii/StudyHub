@@ -218,7 +218,7 @@ function FlashcardViewComponent({
                 Submit as Wrong
               </Button>
               <Button
-                variant="primary"
+                variant="default"
                 onClick={() => handleAnswer(true)}
                 disabled={isSubmitting}
               >

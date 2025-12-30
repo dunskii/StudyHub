@@ -7,9 +7,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.auth import get_current_user
-from app.core.security import push_rate_limiter, require_push_rate_limit
-from app.models import User
+from app.core.security import CurrentUser, get_current_user, push_rate_limiter, require_push_rate_limit
 from app.schemas.push import (
     PushSubscriptionCreate,
     PushSubscriptionResponse,
@@ -22,7 +20,7 @@ from app.services.push_service import PushService
 router = APIRouter(prefix="/push", tags=["push"])
 
 # Type aliases
-AuthenticatedUser = Annotated[User, Depends(get_current_user)]
+AuthenticatedUser = Annotated[CurrentUser, Depends(get_current_user)]
 Database = Annotated[AsyncSession, Depends(get_db)]
 RateLimited = Annotated[None, Depends(require_push_rate_limit)]
 

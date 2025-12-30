@@ -47,7 +47,7 @@ export function NotesPage() {
   const { data: selectedNote } = useNote(selectedNoteId, studentId)
 
   // OCR status polling
-  const { data: ocrStatus, isLoading: isOcrPolling } = useOcrStatus(
+  const { data: _ocrStatus, isLoading: isOcrPolling } = useOcrStatus(
     selectedNoteId,
     studentId
   )

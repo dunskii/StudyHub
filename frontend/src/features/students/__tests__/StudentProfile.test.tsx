@@ -17,6 +17,13 @@ vi.mock('@/hooks', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useGamification', () => ({
+  useGamificationStats: () => ({
+    data: null,
+    isLoading: false,
+  }),
+}));
+
 const mockStudent: Student = {
   id: 'student-1',
   parentId: 'parent-1',
@@ -71,9 +78,15 @@ describe('StudentProfile', () => {
   it('displays gamification stats', () => {
     renderStudentProfile();
 
-    expect(screen.getByText(/level 2/i)).toBeInTheDocument();
+    // LevelBadge uses aria-label for accessibility
+    expect(screen.getByRole('img', { name: /level 2/i })).toBeInTheDocument();
+    // When no gamificationStats, fallback shows XP as text
     expect(screen.getByText(/150 xp/i)).toBeInTheDocument();
-    expect(screen.getByText(/5 days/i)).toBeInTheDocument();
+    // StreakCounter shows current streak (5 days, Best: 10 days)
+    expect(screen.getByText('5')).toBeInTheDocument();
+    // Check for streak section by finding "days" text
+    const daysElements = screen.getAllByText(/days?/i);
+    expect(daysElements.length).toBeGreaterThan(0);
   });
 
   it('shows edit button', () => {

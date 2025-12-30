@@ -141,6 +141,24 @@ from app.schemas.parent_dashboard import (
     WeeklyStats,
     WeeklySummaryResponse,
 )
+from app.schemas.deletion import (
+    DeletionCancelledResponse,
+    DeletionCancelRequest,
+    DeletionConfirmedResponse,
+    DeletionConfirmRequest,
+    DeletionInitiatedResponse,
+    DeletionRequestCreate,
+    DeletionRequestResponse,
+    DeletionStatusResponse,
+    DeletionSummary,
+)
+from app.schemas.ai_usage import (
+    AIUsageHistoryResponse,
+    AIUsageLimits,
+    AIUsageResponse,
+    AIUsageSummary,
+    AIUsageUpdate,
+)
 
 __all__ = [
     # Base
@@ -280,4 +298,20 @@ __all__ = [
     "WeeklySummaryResponse",
     "SendWeeklySummaryRequest",
     "SendWeeklySummaryResponse",
+    # Account Deletion
+    "DeletionRequestCreate",
+    "DeletionConfirmRequest",
+    "DeletionCancelRequest",
+    "DeletionRequestResponse",
+    "DeletionInitiatedResponse",
+    "DeletionConfirmedResponse",
+    "DeletionCancelledResponse",
+    "DeletionStatusResponse",
+    "DeletionSummary",
+    # AI Usage
+    "AIUsageResponse",
+    "AIUsageSummary",
+    "AIUsageLimits",
+    "AIUsageHistoryResponse",
+    "AIUsageUpdate",
 ]

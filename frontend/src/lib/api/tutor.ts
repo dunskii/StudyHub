@@ -198,15 +198,17 @@ export async function completeSession(
   sessionId: string,
   xpEarned = 0
 ): Promise<SessionCompleteResponse> {
-  const response = await api.post(`/api/v1/sessions/${sessionId}/complete`, {
+  const response = await api.post<SessionCompleteResponse>(`/api/v1/sessions/${sessionId}/complete`, {
     xp_earned: xpEarned,
   })
 
   // Transform snake_case to camelCase for gamification result
-  if (response.gamification) {
-    const g = response.gamification
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawResponse = response as any
+  if (rawResponse.gamification) {
+    const g = rawResponse.gamification
     return {
-      ...response,
+      ...rawResponse,
       gamification: {
         xpAwarded: g.xp_awarded,
         multiplier: g.multiplier,

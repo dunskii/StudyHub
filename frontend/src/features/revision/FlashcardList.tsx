@@ -13,7 +13,7 @@ import {
   MoreVertical,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/Button'
+// Button import removed - not currently used
 import { Input } from '@/components/ui/Input'
 import type { Flashcard } from '@/lib/api/revision'
 

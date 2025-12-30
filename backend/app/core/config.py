@@ -85,6 +85,10 @@ class Settings(BaseSettings):
     # Rate Limiting
     rate_limit_per_minute: int = 60
 
+    # Security
+    csp_report_uri: str | None = None  # Optional CSP violation report endpoint
+    admin_api_key: str = ""  # API key for admin/scheduled task endpoints
+
     # Pagination
     max_page_number: int = 1000  # Prevent expensive offset queries
 

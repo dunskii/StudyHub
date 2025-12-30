@@ -44,13 +44,13 @@ class PushSubscription(Base):
 
     # Subscription status
     is_active = Column(Boolean, default=True, nullable=False)
-    last_used_at = Column(DateTime, nullable=True)
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
     failed_attempts = Column(Integer, default=0, nullable=False)
 
     # Timestamps
-    created_at = Column(DateTime, default=utc_now, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
     updated_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=utc_now,
         onupdate=utc_now,
         nullable=False,

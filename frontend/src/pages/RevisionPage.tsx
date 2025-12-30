@@ -130,7 +130,7 @@ export default function RevisionPage() {
         <div className="flex items-center gap-3">
           {manager.dueCardsCount > 0 && (
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleStartSession}
               className="flex items-center gap-2"
             >
@@ -212,7 +212,7 @@ export default function RevisionPage() {
                 </p>
                 <div className="flex justify-center gap-3">
                   <Button
-                    variant="primary"
+                    variant="default"
                     onClick={() => setActiveTab('create')}
                     className="flex items-center gap-2"
                   >
@@ -275,10 +275,9 @@ export default function RevisionPage() {
 
       {/* Revision session modal */}
       <Modal
-        isOpen={showSessionModal}
-        onClose={handleEndSession}
+        open={showSessionModal}
+        onOpenChange={(open) => !open && handleEndSession()}
         title=""
-        size="xl"
       >
         {store.isInSession && (
           <RevisionSession
@@ -302,8 +301,8 @@ export default function RevisionPage() {
 
       {/* Edit flashcard modal */}
       <Modal
-        isOpen={!!editingFlashcard}
-        onClose={() => setEditingFlashcard(null)}
+        open={!!editingFlashcard}
+        onOpenChange={(open) => !open && setEditingFlashcard(null)}
         title="Edit Flashcard"
       >
         {editingFlashcard && (

@@ -1,0 +1,57 @@
+name: Scheduled Tasks
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC (7 PM AEST, 8 PM AEDT)
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    # Allow manual trigger for testing
+    inputs:
+      task:
+        description: 'Task to run'
+        required: true
+        default: 'deletion-reminders'
+        type: choice
+        options:
+          - deletion-reminders
+          - all
+
+env:
+  API_URL: ${{ secrets.API_URL }}
+
+jobs:
+  deletion-reminders:
+    name: Send Deletion Reminders
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event.inputs.task == 'deletion-reminders' || github.event.inputs.task == 'all'
+
+    steps:
+      - name: Send deletion reminder emails
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X POST "${{ env.API_URL }}/api/v1/users/admin/scheduled-tasks/deletion-reminders" \
+            -H "X-Admin-Key: ${{ secrets.ADMIN_API_KEY }}" \
+            -H "Content-Type: application/json")
+
+          # Extract body and status code
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+
+          echo "Response: $body"
+          echo "Status code: $status"
+
+          # Check for success
+          if [ "$status" -ge 200 ] && [ "$status" -lt 300 ]; then
+            echo "✅ Deletion reminders sent successfully"
+            echo "$body" | jq .
+          else
+            echo "❌ Failed to send deletion reminders"
+            exit 1
+          fi
+
+      - name: Report results
+        if: always()
+        run: |
+          echo "## Scheduled Task: Deletion Reminders" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered at**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger type**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY

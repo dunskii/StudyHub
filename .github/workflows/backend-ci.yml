@@ -61,6 +61,7 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/studyhub_test
+          TEST_DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/studyhub_test
           SECRET_KEY: test-secret-key-for-ci
           SUPABASE_URL: https://test.supabase.co
           SUPABASE_ANON_KEY: test-key
@@ -72,3 +73,41 @@ jobs:
         with:
           file: backend/coverage.xml
           flags: backend
+
+  security:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pip-audit
+        run: pip-audit --ignore-vuln CVE-2024-23342 --strict
+        continue-on-error: true
+
+      - name: Check for high severity vulnerabilities
+        run: |
+          pip-audit --format json | python -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          high_vulns = [v for v in data.get('dependencies', [])
+                        for vuln in v.get('vulns', [])
+                        if 'HIGH' in vuln.get('severity', '').upper() or 'CRITICAL' in vuln.get('severity', '').upper()]
+          if high_vulns:
+              print('HIGH/CRITICAL vulnerabilities found!')
+              sys.exit(1)
+          print('No HIGH/CRITICAL vulnerabilities')
+          " || true

@@ -171,14 +171,23 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         # Content Security Policy (adjust as needed for your frontend)
         if settings.is_production:
-            response.headers["Content-Security-Policy"] = (
-                "default-src 'self'; "
-                "script-src 'self'; "
-                "style-src 'self' 'unsafe-inline'; "
-                "img-src 'self' data: https:; "
-                "font-src 'self'; "
-                "connect-src 'self' https://*.supabase.co"
-            )
+            # Build CSP directives for production
+            csp_directives = [
+                "default-src 'self'",
+                "script-src 'self'",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "img-src 'self' data: https: blob:",
+                "font-src 'self' https://fonts.gstatic.com",
+                "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+                "frame-ancestors 'none'",  # Clickjacking protection
+                "base-uri 'self'",  # Prevent base tag injection
+                "form-action 'self'",  # Prevent form hijacking
+                "upgrade-insecure-requests",  # Force HTTPS for resources
+            ]
+            # Add report-uri if configured
+            if settings.csp_report_uri:
+                csp_directives.append(f"report-uri {settings.csp_report_uri}")
+            response.headers["Content-Security-Policy"] = "; ".join(csp_directives)
 
         # HSTS for production
         if settings.is_production:

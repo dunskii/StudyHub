@@ -118,7 +118,7 @@ function RevisionSessionComponent({
           <span>Time spent: {formatTime(elapsedTime)}</span>
         </div>
 
-        <Button variant="primary" size="lg" onClick={onEnd}>
+        <Button variant="default" size="lg" onClick={onEnd}>
           Finish Session
         </Button>
       </div>

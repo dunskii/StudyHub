@@ -1,7 +1,7 @@
 /**
  * API client functions for revision and flashcard operations.
  */
-import { apiClient } from './client'
+import { api } from './client'
 
 // =============================================================================
 // Types
@@ -146,7 +146,7 @@ export const revisionApi = {
     studentId: string,
     data: FlashcardCreate
   ): Promise<Flashcard> {
-    return apiClient.post<Flashcard>(
+    return api.post<Flashcard>(
       `/revision/flashcards?student_id=${studentId}`,
       data
     )
@@ -156,7 +156,7 @@ export const revisionApi = {
     studentId: string,
     flashcards: FlashcardCreate[]
   ): Promise<Flashcard[]> {
-    return apiClient.post<Flashcard[]>(
+    return api.post<Flashcard[]>(
       `/revision/flashcards/bulk?student_id=${studentId}`,
       { flashcards }
     )
@@ -172,13 +172,13 @@ export const revisionApi = {
     if (params.offset !== undefined) searchParams.set('offset', String(params.offset))
     if (params.limit !== undefined) searchParams.set('limit', String(params.limit))
 
-    return apiClient.get<FlashcardListResponse>(
+    return api.get<FlashcardListResponse>(
       `/revision/flashcards?${searchParams.toString()}`
     )
   },
 
   async getFlashcard(flashcardId: string, studentId: string): Promise<Flashcard> {
-    return apiClient.get<Flashcard>(
+    return api.get<Flashcard>(
       `/revision/flashcards/${flashcardId}?student_id=${studentId}`
     )
   },
@@ -188,14 +188,14 @@ export const revisionApi = {
     studentId: string,
     data: FlashcardUpdate
   ): Promise<Flashcard> {
-    return apiClient.put<Flashcard>(
+    return api.put<Flashcard>(
       `/revision/flashcards/${flashcardId}?student_id=${studentId}`,
       data
     )
   },
 
   async deleteFlashcard(flashcardId: string, studentId: string): Promise<void> {
-    return apiClient.delete(`/revision/flashcards/${flashcardId}?student_id=${studentId}`)
+    return api.delete(`/revision/flashcards/${flashcardId}?student_id=${studentId}`)
   },
 
   // AI Generation
@@ -203,7 +203,7 @@ export const revisionApi = {
     studentId: string,
     request: FlashcardGenerateRequest
   ): Promise<FlashcardGenerateResponse> {
-    return apiClient.post<FlashcardGenerateResponse>(
+    return api.post<FlashcardGenerateResponse>(
       `/revision/flashcards/generate?student_id=${studentId}`,
       request
     )
@@ -220,14 +220,14 @@ export const revisionApi = {
     if (subjectId) searchParams.set('subject_id', subjectId)
     if (limit) searchParams.set('limit', String(limit))
 
-    return apiClient.get<Flashcard[]>(`/revision/due?${searchParams.toString()}`)
+    return api.get<Flashcard[]>(`/revision/due?${searchParams.toString()}`)
   },
 
   async submitAnswer(
     studentId: string,
     answer: RevisionAnswerRequest
   ): Promise<RevisionAnswerResponse> {
-    return apiClient.post<RevisionAnswerResponse>(
+    return api.post<RevisionAnswerResponse>(
       `/revision/answer?student_id=${studentId}`,
       answer
     )
@@ -235,13 +235,13 @@ export const revisionApi = {
 
   // Progress
   async getProgress(studentId: string): Promise<RevisionProgress> {
-    return apiClient.get<RevisionProgress>(
+    return api.get<RevisionProgress>(
       `/revision/progress?student_id=${studentId}`
     )
   },
 
   async getProgressBySubject(studentId: string): Promise<SubjectProgress[]> {
-    return apiClient.get<SubjectProgress[]>(
+    return api.get<SubjectProgress[]>(
       `/revision/progress/by-subject?student_id=${studentId}`
     )
   },
@@ -256,6 +256,6 @@ export const revisionApi = {
     if (flashcardId) searchParams.set('flashcard_id', flashcardId)
     if (limit) searchParams.set('limit', String(limit))
 
-    return apiClient.get<RevisionHistory[]>(`/revision/history?${searchParams.toString()}`)
+    return api.get<RevisionHistory[]>(`/revision/history?${searchParams.toString()}`)
   },
 }
